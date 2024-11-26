@@ -46,7 +46,7 @@ Occassionally, the number of teams and number of appearances (when multiplied to
 The scheduler comes built in with checks for the schedule produced in the 'CheckSchedule.py' file. The checks do not need to be run with pypy as they do not take very long to run and do not require any libraries beyond those provided automatically with Python. If you are using just the checks and not the schedule creator, you still need 'CheckSchedule.py', 'GlobalConstants.py', and 'GeneralFunctions.py'. To run these checks, you can:
  - Press enter after generating a schedule
  - Choose 'C' for Check Schedule in the 'RunFRAMS.py' menu and give the path to the schedule
- - Run `'CheckSchedule.py' 'path/to/schedule.txt'`, where 'path/to/schedule.txt' is the path to the schedule.
+ - Run `'CheckSchedule.py' 'path/to/schedule.txt'`, where 'path/to/schedule.txt' is the location of the schedule. Note that you can also specify `--arenas 2` to specify that this schedule is being used with 2 arenas.
 
 Throughout the checks, colours are used to give clarity and emphasis for different sections. These colours are:
  - Green - section is perfect.
@@ -123,6 +123,7 @@ if the number of identical matches (All 4 teams numbers are the same across mult
 ### Zone allocation check
 
 The standard deviation is calculated from the number of times that team starts in each corner. The target standard deviation for the number of appearances is also calculated. If the number of appearances is a multiple of 4, this standard deviation will be 0; otherwise it will be non-zero. This target standard deviation will be shown in dark green, unless all teams have the ideal standard deviation, where it will then be shown in green as the zone allocation check section will be perfect. The other colours are given when the standard deviation is greater than the following values:
+
  - Red: standard deviation > 3.0
  - Orange: standard deviation > 1.8
  - Yellow: standard deviation > 1.4
@@ -132,24 +133,28 @@ The standard deviation is calculated from the number of times that team starts i
 Note that for this whole part, the spacing will be given as the number of matches between matches, such that a spacing of 3 is (on, off, off, off, on).
 
 For minimum spacing, the following numbers are used if the spacing is equal to these numbers:
+
  - Red: minimum spacing of 0
  - Orange: minimum spacing of 1
  - Yellow: minimum spacing of 2
 
 For maximum spacing, the ideal spacing is first calculating. This is given by: $\textrm{spacing}_\textrm{target}$ = $\frac{\textrm{N}^\textrm{o}\textrm{teams}}{4} - 1$. The maximum spacing is then coloured by the following rules:
- - Orange: $\textrm{spacing}_\textrm{max} > 3 \times \textrm{spacing}_\textrm{target}$
- - Yellow: $\textrm{spacing}_\textrm{max} > 2 \times \textrm{spacing}_\textrm{target} + 1$
+
+ - Orange: $\textrm{facing}\_\textrm{max} > 3 \times \textrm{spacing}_\textrm{target}$
+ - Yellow: $\textrm{spacing}\_\textrm{max} > 2 \times \textrm{spacing}_\textrm{target} + 1$
 
 For average spacing, the team(s) whose average spacing is closest to the $\textrm{spacing}_\textrm{target}$ calculated above are coloured in dark green.
 
 ### Facings
 
 For the facings section, the best possible facing for the number of teams and number of appearances is determined. With enough appearances, this will result in all teams being played and 0 misses, but with fewer appearances, the best possible facing is limited by the number of appearances. Teams with this best facing are coloured dark green. If all teams have this best facing, then it will be coloured green as this section is perfect. The other colours are given as follows when the number of teams faced ("facing") is worse than given:
+
  - Red: $\textrm{facing} < \textrm{facing}_\textrm{best}-10$
  - Orange: $\textrm{facing} < \textrm{facing}_\textrm{best}-6$
  - Yellow: $\textrm{facing} < \textrm{facing}_\textrm{best}-4$
 
 For repeats, the ideal number of times a team should be faced is calculated: $\textrm{repeat}_\textrm{target} = \frac{3 \times \textrm{N}^\textrm{o}\textrm{appearances}}{\textrm{N}^\textrm{o}\textrm{teams}}$. The colours are then given when a team plays at least one team more than that many of times:
+
  - Red: $\textrm{N}^\textrm{o}\textrm{repeats} > \textrm{repeat}_\textrm{target}+4$
  - Orange: $\textrm{N}^\textrm{o}\textrm{repeats} > \textrm{repeat}_\textrm{target}+2$
  - Yellow: $\textrm{N}^\textrm{o}\textrm{repeats} > \textrm{repeat}_\textrm{target}+1$
@@ -195,7 +200,7 @@ The match schedule is analysed to find any partial overlaps (3 of the 4 teams in
 
 #### Zones score
 
-This is considered separately to the rest of the scores, but it is calculated by: $\textrm{score}_\textrm{zone} = |x_\textrm{target} - x|^3$, where $x$ is the number of times a team plays in that corner and $x_\textrm{target}$ is the target number of times a team plays in that corner, which is $\frac{\textrm{N}^\textrm{o}\textrm{appearances}}{4}$.
+This is considered separately to the rest of the scores, but it is calculated by: $\textrm{score}\_\textrm{zone} = |x_\textrm{target} - x|^3$, where $x$ is the number of times a team plays in that corner and $x_\textrm{target}$ is the target number of times a team plays in that corner, which is $\frac{\textrm{N}^\textrm{o}\textrm{appearances}}{4}$.
 
 ### How a schedule is generated
 
