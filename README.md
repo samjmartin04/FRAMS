@@ -2,7 +2,7 @@
 
 ### Four Robot Automatic Match Scheduler
 
-FRAMS is a four team match scheduler designed for use in [Student Robotics](www.studentrobotics.org) competitions.
+FRAMS is a four team match scheduler designed for use in [Student Robotics](https://www.studentrobotics.org) competitions.
 
 This README is a guide on how to create schedules, optimise existing schedules, and how to check schedules that have been produced.
 
