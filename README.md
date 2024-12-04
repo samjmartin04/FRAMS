@@ -140,7 +140,7 @@ For minimum spacing, the following numbers are used if the spacing is equal to t
 
 For maximum spacing, the ideal spacing is first calculating. This is given by: $\textrm{spacing}_\textrm{target}$ = $\frac{\textrm{N}^\textrm{o}\textrm{teams}}{4} - 1$. The maximum spacing is then coloured by the following rules:
 
- - Orange: $\textrm{facing}\_\textrm{max} > 3 \times \textrm{spacing}_\textrm{target}$
+ - Orange: $\textrm{spacing}\_\textrm{max} > 3 \times \textrm{spacing}_\textrm{target}$
  - Yellow: $\textrm{spacing}\_\textrm{max} > 2 \times \textrm{spacing}_\textrm{target} + 1$
 
 For average spacing, the team(s) whose average spacing is closest to the $\textrm{spacing}_\textrm{target}$ calculated above are coloured in dark green.
