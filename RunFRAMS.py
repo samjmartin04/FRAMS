@@ -149,8 +149,6 @@ while True:
         response = input("Press enter to continue and view a summary of the checks...")
 
         interact_with_checks(match_schedule)
-
-
     elif response.casefold()[:1] == "g":
         print("\nGenerate Schedule:\n")
         number_of_teams_int_check = True
@@ -212,7 +210,10 @@ while True:
 
         location_name = input("File/location for schedule (must end in .txt): ")
         if location_name == "":
-            location_name = f"Schedules/schedule_t{number_of_teams}-a{number_of_appearances}.txt"
+            if os.path.isdir("Schedules"):
+                location_name = f"Schedules/schedule_t{number_of_teams}-a{number_of_appearances}.txt"
+            else:
+                location_name = f"schedule_t{number_of_teams}-a{number_of_appearances}.txt"
         
         location = check_location(location_name)
 
