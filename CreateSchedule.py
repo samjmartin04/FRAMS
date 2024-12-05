@@ -638,7 +638,7 @@ def optimise_schedule_from_file(file_location, optimisation_level=0):
 
 #Generating schedule::
 
-def generate_schedule(number_of_teams, number_of_appearances, optimisation_level=0, silent=False):
+def generate_schedule(number_of_teams, number_of_appearances, optimisation_level=0, silent=False, match_schedule=[]):
     global time_taken_spacing, time_taken_facings, time_taken_overlap, time_taken_shuffling
     time_taken_spacing, time_taken_facings, time_taken_overlap, time_taken_shuffling = 0, 0, 0, 0
     if number_of_teams*number_of_appearances % 4 == 0:
@@ -668,7 +668,7 @@ def generate_schedule(number_of_teams, number_of_appearances, optimisation_level
         rounds_per_block = 4
     
     blocks_needed = number_of_appearances/rounds_per_block
-    match_schedule = []
+    # match_schedule = []
     blocks_added = 0
     while blocks_needed >= 2:
         match_list_unseparated = []
