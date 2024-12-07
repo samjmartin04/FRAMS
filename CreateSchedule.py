@@ -638,7 +638,7 @@ def optimise_schedule_from_file(file_location, optimisation_level=0):
 
 #Generating schedule::
 
-def generate_schedule(number_of_teams, number_of_appearances, optimisation_level=0, silent=False, match_schedule=[]):
+def generate_schedule(number_of_teams, number_of_appearances, optimisation_level=0, silent=False, match_schedule=[], teams_to_exclude=[]):
     global time_taken_spacing, time_taken_facings, time_taken_overlap, time_taken_shuffling
     time_taken_spacing, time_taken_facings, time_taken_overlap, time_taken_shuffling = 0, 0, 0, 0
     if number_of_teams*number_of_appearances % 4 == 0:
@@ -673,8 +673,9 @@ def generate_schedule(number_of_teams, number_of_appearances, optimisation_level
     while blocks_needed >= 2:
         match_list_unseparated = []
         for m in range(rounds_per_block):
-            for t in range(number_of_teams):
-                match_list_unseparated.append(t+1)
+            for t in range(number_of_teams+len(teams_to_exclude)):
+                if not t+1 in teams_to_exclude:
+                    match_list_unseparated.append(t+1)
         
         league_block = []
         n = 0
@@ -709,18 +710,19 @@ def generate_schedule(number_of_teams, number_of_appearances, optimisation_level
     match_list_unseparated = []
     count = 1
     for m in range(int(rounds_per_block*blocks_needed)):
-        for t in range(number_of_teams):
-            match_list_unseparated.append(t+1)
-            count += 1
-            if count/remaining >= 0.33 and not fake_1_added:
-                match_list_unseparated.append(-1)
-                fake_1_added = True
-            if count/remaining >= 0.66 and not fake_2_added:
-                match_list_unseparated.append(-1)
-                fake_2_added = True
-            if count/remaining >= 0.99 and not fake_3_added:
-                match_list_unseparated.append(-1)
-                fake_3_added = True
+        for t in range(number_of_teams+len(teams_to_exclude)):
+            if not t+1 in teams_to_exclude:
+                match_list_unseparated.append(t+1)
+                count += 1
+                if count/remaining >= 0.33 and not fake_1_added:
+                    match_list_unseparated.append(-1)
+                    fake_1_added = True
+                if count/remaining >= 0.66 and not fake_2_added:
+                    match_list_unseparated.append(-1)
+                    fake_2_added = True
+                if count/remaining >= 0.99 and not fake_3_added:
+                    match_list_unseparated.append(-1)
+                    fake_3_added = True
     
     if not fake_3_added:
         match_list_unseparated.append(-1)

@@ -165,13 +165,25 @@ If the schedule generated is not satisfactory and you have already tried generat
 
 Note: optimising a schedule will mix any (league) blocks in your schedule. If your schedule creates distinct blocks for the league and you wish to not have these blocks merge togther, then you should not optimise the schedule.
 
-## Add to existing schedule
+## Modify existing schedule
 
 This features enables you to add additional matches to an already existing schedule. This allows for adding a few more appearances to a schedule without having to completely generate a new one. Depending on the number of teams and number of appearances to add, this may result in more than the optimal number of 3 robot matches than would be expected for the overall numbers of appearances for the number of teams in the whole schedule. If no location is given for the new schedule, it will use the name of the schedule it is based on with '_extended' at the end.
 
-The additional matches being added do not have to have the same number of teams as the already existing matches. Whilst this is a feature you do not really want to use, it is useful if a team has been removed from the schedule, the matches start, and then the team turns up, as you cannot substitute in a whole new schedule at this stage. In this circumstance, you can take the already existing schedule and crop it at a number of appearances that is slightly more than have already happen. You can then enter the new correct number of teams and then the remaining number of appearances desired. Remember to assign teams the same numbers they were originally assigned (and to give the new team the new highest number), so that the existing matches still remain the same.
+The additional matches being added do not have to have the same number of teams as the already existing matches. You could use this to add a team back in after the schedule has started or remove a team that drops out after it has started.
 
 Note: cropping at a multiple of 4 number of appearances is much more likely for the crop to succeed and not give teams in the cropped schedule unequal numbers of appearances.
+
+### Adding a team
+
+Whilst this is a feature you ideally should not be using, it is useful if a team has been removed from the schedule, the matches start, and then the team turns up, as you cannot substitute in a whole new schedule at this stage. In this circumstance, you can take the already existing schedule and crop it at a number of appearances that is slightly more than have already happen. You can then enter the new correct number of teams and then the remaining number of appearances desired.
+
+Remember to assign teams the same numbers they were originally assigned (and to give the new team the new highest number), so that the existing matches still remain the same.
+
+### Removing a team
+
+If a team, for example, has dropped out after the first day, note the number of the team that should be removed, crop the schedule at a reasonable point, ideally straight after the last match of the day, but it may have to be quite a few matches after this. Then enter the number of teams you had, minus the teams you wish to remove (e.g. if you had 24 teams and wish to remove 2 teams, you should enter 22) and then enter the number(s) of the team(s) you wish to remove, separated by commas. Enter the remaining number of appearances desired. Note if you are removing multiple teams, particularly if it is early on in the schedule, the checks may end up being less useful as the number of appearances per team will be calculated to be less than the number of appearances that most teams have.
+
+Remember to assign teams the same numbers they were originally assigned, so that the existing matches still remain the same.
 
 ## Acknowledgements
 

@@ -310,3 +310,51 @@ def get_team_numbers_not_in_list(number_of_teams, list_to_exclude):
         if not team_number in list_to_exclude:
             output_array.append(team_number)
     return output_array
+
+def number_array_from_list(list):
+    try:
+        list = list.replace(" ", "")
+        pos1 = list.find(",")
+        array = []
+        if pos1 == -1:
+            if not len(list) == 0:
+                try:
+                    num = list
+                    array.append(num)
+                except:
+                    pass
+        else:
+            try:
+                array.append(list[:pos1])
+            except:
+                pass
+        while not pos1 == -1:
+            pos2 = list[pos1+1:].find(",")
+            if pos2 == -1:
+                pos2 = len(list)
+            else:
+                pos2 += pos1+1
+            try:
+                num = list[pos1+1:pos2]
+                array.append(num)
+            except:
+                pass
+            list = list[pos1+1:]
+            pos1 = list.find(",")
+
+        new_array = []
+        for item in array:
+            pos = str(item).find("-")
+            if pos == -1:
+                new_array.append(int(item))
+            else:
+                first_num = int(str(item)[:pos])
+                second_num = int(str(item)[pos+1:])
+                n = first_num
+                while n <= second_num:
+                    new_array.append(n)
+                    n += 1
+        return new_array
+    except Exception as e:
+        print(f"\nERROR PROCESSING LIST ENTERED: {e}")
+        return []
