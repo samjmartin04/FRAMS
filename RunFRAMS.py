@@ -121,7 +121,7 @@ while True:
         while truncate_schedule_check:
             response = input("Truncate schedule using (A)ppearance number, (M)atch Number, (N)o truncation? Response (A/M/N): ")
             if response.casefold()[:1] == "a":
-                crop_appearances = int(input("Number of appearances before cut-off: "))
+                crop_appearances = int(input("(Minimum) number of appearances before cut-off: "))
 
                 list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule_old)
                 success = False
@@ -145,30 +145,36 @@ while True:
                 else:
                     print("Failed to cut the match schedule for that number of appearances. Please try a different number of appearances.")
             elif response.casefold()[:1] == "m":
-                crop_match_num = int(input("Number of matches before cut-off: "))
+                crop_match_num = int(input("(Minimum) number of matches before cut-off: "))
                 list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule_old)
-                cropped_schedule = match_schedule_old[:crop_match_num]
-                appearances_dict = {}
-                for specific_team_number in list_of_team_numbers:
-                    appearances_for_team = get_appearances_data(cropped_schedule, specific_team_number)
-                    if appearances_for_team in appearances_dict.keys():
-                        appearances_dict[appearances_for_team] += 1
-                    else:
-                        appearances_dict[appearances_for_team] = 1
-                number_of_teams = get_number_of_teams_from_schedule(match_schedule_old)
+
                 success = False
-                for key in appearances_dict.keys():
-                    if appearances_dict[key] == number_of_teams:
-                        success = True
+                n = crop_match_num
+                while n < len(match_schedule_old)+1 and not success:
+                    cropped_schedule = match_schedule_old[:n]
+                    appearances_dict = {}
+                    for specific_team_number in list_of_team_numbers:
+                        appearances_for_team = get_appearances_data(cropped_schedule, specific_team_number)
+                        if appearances_for_team in appearances_dict.keys():
+                            appearances_dict[appearances_for_team] += 1
+                        else:
+                            appearances_dict[appearances_for_team] = 1
+                    number_of_teams = get_number_of_teams_from_schedule(match_schedule_old)
+                    for key in appearances_dict.keys():
+                        if appearances_dict[key] == number_of_teams and key > 0:
+                            success = True
+                    if n == len(match_schedule_old):
+                        success = False
+                        break
+                    if not success:
+                        n += 1
+
                 if success:
-                    print(f"Successfully cut the existing schedule to have only {crop_match_num} matches, which gives {key} appearances per team.")
+                    print(f"Successfully cut the existing schedule to have only {n} matches, which gives {key} appearances per team.")
                     truncate_schedule_check = False
                 else:
-                    response_check = input(f"That number of matches gives an equal number of appearances per team. Do you want to continue? (Y/N): ")
-                    if response_check.casefold()[:1] == "y":
-                        print(f"Cut the existing schedule to have only {crop_match_num} matches, with an unequal number of appearances per team.")
-                        truncate_schedule_check = False
-                match_schedule = [match_schedule_old[:crop_match_num-1]]
+                    print("Failed to find a point to crop the schedule after that number of matches that gave all teams the same number of appearances.")
+                match_schedule = [match_schedule_old[:n]]
             elif response.casefold()[:1] == "n":
                 truncate_schedule_check = False
                 match_schedule = [match_schedule_old]

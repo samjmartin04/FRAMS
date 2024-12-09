@@ -167,9 +167,9 @@ Note: optimising a schedule will mix any (league) blocks in your schedule. If yo
 
 ## Modify existing schedule
 
-This features enables you to add additional matches to an already existing schedule. This allows for adding a few more appearances to a schedule without having to completely generate a new one. Depending on the number of teams and number of appearances to add, this may result in more than the optimal number of 3 robot matches than would be expected for the overall numbers of appearances for the number of teams in the whole schedule. If no location is given for the new schedule, it will use the name of the schedule it is based on with '_extended' at the end.
+This features enables you to add additional matches to an already existing schedule. This allows for adding a few more appearances to a schedule without having to completely generate a new one. Depending on the number of teams and number of appearances to add, this may result in more than the optimal number of 3 robot matches than would be expected for the overall numbers of appearances for the number of teams in the whole schedule. If no location is given for the new schedule, it will use the name of the schedule it is based on with '_extended' at the end. The number of matches or number of appearances which is used to crop the schedules checks that it gives an equal number of appearances for each team or a whole number of matches respectively. If this does not happen, the number of matches in the crop is increased until every team has the same number of appearances (if possible).
 
-The additional matches being added do not have to have the same number of teams as the already existing matches. You could use this to add a team back in after the schedule has started or remove a team that drops out after it has started.
+The additional matches being added do not have to have the same number of teams as the already existing matches. You could use this to add a team back in after the schedule has started or remove a team that drops out after it has started. Note that changing the number of teams will affect the usefulness (and sometimes accuracy) of the checks at the end.
 
 Note: cropping at a multiple of 4 number of appearances is much more likely for the crop to succeed and not give teams in the cropped schedule unequal numbers of appearances.
 
