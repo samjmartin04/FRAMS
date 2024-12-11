@@ -88,7 +88,8 @@ while True:
         location = check_location(location_name)
 
         program_start = int(time.time())
-        match_schedule = generate_schedule(number_of_teams, number_of_appearances, optimisation_level=speed_mode, silent=True)
+        start_schedule = []
+        match_schedule = generate_schedule(number_of_teams, number_of_appearances, optimisation_level=speed_mode, silent=True, match_schedule=start_schedule)
 
         match_schedule = remove_league_blocks_from_schedule(match_schedule)
 
