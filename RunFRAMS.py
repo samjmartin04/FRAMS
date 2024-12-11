@@ -122,7 +122,12 @@ while True:
             response = input("Truncate schedule using (A)ppearance number, (M)atch Number, (N)o truncation? Response (A/M/N): ")
             if response.casefold()[:1] == "a":
                 crop_appearances = int(input("(Minimum) number of appearances before cut-off: "))
-
+                num_appearances = get_appearances_from_schedule(match_schedule_old)
+                exclude_from_appearance_check = []
+                for specific_team_number in list_of_team_numbers:
+                    appearances_for_team = get_appearances_data(cropped_schedule, specific_team_number)
+                    if appearances_for_team != num_appearances:
+                        exclude_from_appearance_check.append(specific_team_number)
                 list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule_old)
                 success = False
                 n = 1
@@ -130,10 +135,11 @@ while True:
                     success_n = True
                     cropped_schedule = match_schedule_old[:n]
                     for specific_team_number in list_of_team_numbers:
-                        appearances_for_team = get_appearances_data(cropped_schedule, specific_team_number)
-                        if appearances_for_team != crop_appearances:
-                            success_n = False
-                            break
+                        if not specific_team_number in exclude_from_appearance_check:
+                            appearances_for_team = get_appearances_data(cropped_schedule, specific_team_number)
+                            if appearances_for_team != crop_appearances:
+                                success_n = False
+                                break
                     if success_n:
                         success = True
                     else:
@@ -147,21 +153,27 @@ while True:
             elif response.casefold()[:1] == "m":
                 crop_match_num = int(input("(Minimum) number of matches before cut-off: "))
                 list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule_old)
-
+                num_appearances = get_appearances_from_schedule(match_schedule_old)
+                exclude_from_appearance_check = []
+                for specific_team_number in list_of_team_numbers:
+                    appearances_for_team = get_appearances_data(match_schedule_old, specific_team_number)
+                    if appearances_for_team != num_appearances:
+                        exclude_from_appearance_check.append(specific_team_number)
                 success = False
                 n = crop_match_num
                 while n < len(match_schedule_old)+1 and not success:
                     cropped_schedule = match_schedule_old[:n]
-                    appearances_dict = {}
+                    appearances_dict = {}                    
                     for specific_team_number in list_of_team_numbers:
                         appearances_for_team = get_appearances_data(cropped_schedule, specific_team_number)
-                        if appearances_for_team in appearances_dict.keys():
-                            appearances_dict[appearances_for_team] += 1
-                        else:
-                            appearances_dict[appearances_for_team] = 1
+                        if not specific_team_number in exclude_from_appearance_check:
+                            if appearances_for_team in appearances_dict.keys():
+                                appearances_dict[appearances_for_team] += 1
+                            else:
+                                appearances_dict[appearances_for_team] = 1
                     number_of_teams = get_number_of_teams_from_schedule(match_schedule_old)
                     for key in appearances_dict.keys():
-                        if appearances_dict[key] == number_of_teams and key > 0:
+                        if appearances_dict[key] == number_of_teams-len(exclude_from_appearance_check) and key > 0:
                             success = True
                     if n == len(match_schedule_old):
                         success = False
