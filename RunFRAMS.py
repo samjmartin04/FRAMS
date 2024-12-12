@@ -89,7 +89,8 @@ while True:
 
         program_start = int(time.time())
         start_schedule = []
-        match_schedule = generate_schedule(number_of_teams, number_of_appearances, optimisation_level=speed_mode, silent=True, match_schedule=start_schedule)
+        start_exclude_list = []
+        match_schedule = generate_schedule(number_of_teams, number_of_appearances, optimisation_level=speed_mode, silent=True, match_schedule=start_schedule, teams_to_exclude=start_exclude_list)
 
         match_schedule = remove_league_blocks_from_schedule(match_schedule)
 
