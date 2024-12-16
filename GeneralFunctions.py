@@ -1,6 +1,7 @@
 import csv
 import time
 import os
+import math
 
 from GlobalConstants import *
 
@@ -214,6 +215,18 @@ def get_appearances_from_schedule(match_schedule, in_blocks=False):
                 if team_number in match:
                     appearances_list[team_number-1] += 1
     
+    appearances_dict = {}
+
+    for appearances_for_team in appearances_list:
+        if appearances_for_team in appearances_dict.keys():
+            appearances_dict[appearances_for_team] += 1
+        else:
+            appearances_dict[appearances_for_team] = 1
+
+    for key in appearances_dict.keys():
+        if appearances_dict[key] > int(math.ceil(number_of_teams/2)):
+            return key
+    # Less than half the teams have the same number of appearances, uses mean instead:
     sum = 0
     for count in appearances_list:
         sum += count
