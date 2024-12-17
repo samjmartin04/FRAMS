@@ -120,6 +120,7 @@ while True:
                 print("No schedule found at that location. Please try again.")
         
         truncate_schedule_check = True
+        number_of_teams_old_schedule = get_number_of_teams_from_schedule(match_schedule_old)
         while truncate_schedule_check:
             response = input("Truncate schedule using (A)ppearance number, (M)atch Number, (N)o truncation? Response (A/M/N): ")
             if response.casefold()[:1] == "a":
@@ -184,13 +185,15 @@ while True:
                         n += 1
 
                 if success:
-                    print(f"Successfully cut the existing schedule to have only {n} matches, which gives {key} appearances per team.")
+                    crop_appearances = key
+                    print(f"Successfully cut the existing schedule to have only {n} matches, which gives {crop_appearances} appearances per team.")
                     truncate_schedule_check = False
                 else:
                     print("Failed to find a point to crop the schedule after that number of matches that gave all teams the same number of appearances.")
                 match_schedule = [match_schedule_old[:n]]
             elif response.casefold()[:1] == "n":
                 truncate_schedule_check = False
+                crop_appearances = get_appearances_from_schedule(match_schedule_old)
                 match_schedule = [match_schedule_old]
 
         number_of_teams_int_check = True
@@ -204,10 +207,35 @@ while True:
             
         teams_to_exclude_text = input("Team numbers to exclude: ")
         teams_to_exclude = number_array_from_list(teams_to_exclude_text)
+
+        if len(teams_to_exclude) == (number_of_teams_old_schedule-number_of_teams):
+            number_to_exclude = number_of_teams_old_schedule
+            while number_to_exclude > number_of_teams:
+                teams_to_exclude.append(number_to_exclude)
+                number_to_exclude -= 1
+
+        unique_teams_to_exclude = set()
+        for team_number in exclude_from_appearance_check:
+            unique_teams_to_exclude.add(team_number)
+        
+        for team_number in teams_to_exclude:
+            unique_teams_to_exclude.add(team_number)
+        
+        if number_of_teams > number_of_teams_old_schedule:
+            number_to_exclude = number_of_teams_old_schedule+1
+            while number_to_exclude <= number_of_teams:
+                unique_teams_to_exclude.add(number_to_exclude)
+                number_to_exclude += 1
+        
+        teams_to_exclude_from_checks = list(unique_teams_to_exclude)
         
         number_of_appearances_int_check = True
+        old_appearances = get_appearances_from_schedule(match_schedule_old)
+        recommended_appearances = old_appearances-key
+        if recommended_appearances > 0:
+            recommended_appearances_text = print(f"Recommended number of additional appearances is {recommended_appearances}")
         while number_of_appearances_int_check:
-            number_of_appearances = input("Number of Appearances: ")
+            number_of_appearances = input("Number of additional Appearances: ")
             try:
                 number_of_appearances = int(number_of_appearances)
                 number_of_appearances_int_check = False
@@ -268,7 +296,7 @@ while True:
 
         response = input("Press enter to continue and view a summary of the checks...")
 
-        interact_with_checks(match_schedule)
+        interact_with_checks(match_schedule, teams_to_exclude_from_checks)
     elif response.casefold()[:1] == "o":
         found_schedule = False
         while not found_schedule:

@@ -3,6 +3,7 @@ import time
 import math
 import argparse
 import statistics
+from collections import Counter
 
 from GlobalConstants import *
 from GeneralFunctions import *
@@ -48,9 +49,23 @@ def min_value_from_list(list):
             min_value = value
     return min_value
 
+def min_value_from_dict(dict):
+    min_value = dict[next(iter(dict))]
+    for value in dict.values():
+        if value < min_value:
+            min_value = value
+    return min_value
+
 def max_value_from_list(list):
     max_value = list[0]
     for value in list:
+        if value > max_value:
+            max_value = value
+    return max_value
+
+def max_value_from_dict(dict):
+    max_value = dict[next(iter(dict))]
+    for value in dict.values():
         if value > max_value:
             max_value = value
     return max_value
@@ -61,34 +76,41 @@ def av_value_from_list(list):
         sum += value
     return sum/len(list)
 
-def spacing_check(match_schedule, summary_of_checks, detailed=False):
-    number_of_teams = get_number_of_teams_from_schedule(match_schedule)
+def av_value_from_dict(dict):
+    sum = 0
+    for value in dict.values():
+        sum += value
+    return sum/len(dict.keys())
+
+def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detailed=False):
+    number_of_teams = get_number_of_teams_from_schedule(match_schedule)-len(exclude_teams_list)
     output_text = "\n## Spacings\n"
     output_text += "\n#### This looks at the spacing between matches for each team."
     if INCREMENT_SPACING_CHECK:
         output_text += "\n#### Spacing is given as the difference between the two match numbers. E.g. a spacing of 4 is (on, off, off, off, on).\n"
     else:
         output_text += "\n#### Spacing is given as the gap between two matches. E.g. a spacing of 3 is (on, off, off, off, on).\n"
-    min_spacings_list = []
-    av_spacings_list = []
-    max_spacings_list = []
-    spacings_data_all = []
+    min_spacings_list = {}
+    av_spacings_list = {}
+    max_spacings_list = {}
+    spacings_data_all = {}
     list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule)
     number_of_teams_per_match = get_number_of_teams_per_match_from_schedule(match_schedule)
     for team_number in list_of_team_numbers:
-        spacings_data = get_spacing_data(match_schedule, team_number)
-        spacings_data_all.append(spacings_data)
-        if INCREMENT_SPACING_CHECK:
-            n = 0
-            while n < len(spacings_data):
-                spacings_data[n] += 1
-                n += 1
-        # min_spacings_list[team_number] = min_value_from_list(spacings_data)
-        # max_spacings_list[team_number] = max_value_from_list(spacings_data)
-        # av_spacings_list[team_number] = round(av_value_from_list(spacings_data), 2)
-        min_spacings_list.append(min_value_from_list(spacings_data))
-        max_spacings_list.append(max_value_from_list(spacings_data))
-        av_spacings_list.append(round(av_value_from_list(spacings_data), 2))
+        if not team_number in exclude_teams_list:
+            spacings_data = get_spacing_data(match_schedule, team_number)
+            if INCREMENT_SPACING_CHECK:
+                n = 0
+                while n < len(spacings_data):
+                    spacings_data[n] += 1
+                    n += 1
+            spacings_data_all[team_number] = spacings_data
+            min_spacings_list[team_number] = min_value_from_list(spacings_data)
+            max_spacings_list[team_number] = max_value_from_list(spacings_data)
+            av_spacings_list[team_number] = round(av_value_from_list(spacings_data), 2)
+            # min_spacings_list.append(min_value_from_list(spacings_data))
+            # max_spacings_list.append(max_value_from_list(spacings_data))
+            # av_spacings_list.append(round(av_value_from_list(spacings_data), 2))
     
     strong_alert_level_low = 0
     medium_alert_level_low = 1
@@ -103,20 +125,22 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
         strong_alert_level += 1
         medium_alert_level += 1
         weak_alert_level += 1
+        weak_alert_level_high += 1
+        medium_alert_level_high += 1
 
     min_spacing_summary_list = []
     max_spacing_summary_list = []
     av_spacing_summary_list = []
 
-    min_spacing_summary_list.append(min_value_from_list(min_spacings_list))
-    min_spacing_summary_list.append(av_value_from_list(min_spacings_list))
-    min_spacing_summary_list.append(max_value_from_list(min_spacings_list))
-    max_spacing_summary_list.append(min_value_from_list(max_spacings_list))
-    max_spacing_summary_list.append(av_value_from_list(max_spacings_list))
-    max_spacing_summary_list.append(max_value_from_list(max_spacings_list))
-    av_spacing_summary_list.append(min_value_from_list(av_spacings_list))
-    av_spacing_summary_list.append(av_value_from_list(av_spacings_list))
-    av_spacing_summary_list.append(max_value_from_list(av_spacings_list))
+    min_spacing_summary_list.append(min_value_from_dict(min_spacings_list))
+    min_spacing_summary_list.append(av_value_from_dict(min_spacings_list))
+    min_spacing_summary_list.append(max_value_from_dict(min_spacings_list))
+    max_spacing_summary_list.append(min_value_from_dict(max_spacings_list))
+    max_spacing_summary_list.append(av_value_from_dict(max_spacings_list))
+    max_spacing_summary_list.append(max_value_from_dict(max_spacings_list))
+    av_spacing_summary_list.append(min_value_from_dict(av_spacings_list))
+    av_spacing_summary_list.append(av_value_from_dict(av_spacings_list))
+    av_spacing_summary_list.append(max_value_from_dict(av_spacings_list))
 
     top_line_text = "                     min    av     max"
     min_spacing_output_text = f"Minimum Spacings:   {min_spacing_summary_list[0]:4.1f}   {min_spacing_summary_list[1]:4.1f}   {min_spacing_summary_list[2]:4.1f}"
@@ -126,10 +150,11 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
     output_text += f"\n{top_line_text}\n{min_spacing_output_text}\n{av_spacing_output_text}\n{max_spacing_output_text}\n"
 
     min_spacings_count_list = []
+    min_spacing_list_totals = Counter(min_spacings_list.values())
     total = 0
     n = 0
     while n < 99:
-        number_of_n = min_spacings_list.count(n)
+        number_of_n = min_spacing_list_totals[n]
         min_spacings_count_list.append(number_of_n)
         total += number_of_n
         if total == number_of_teams:
@@ -137,10 +162,11 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
         n += 1
     
     max_spacings_count_list = []
+    ax_spacing_list_totals = Counter(max_spacings_list.values())
     total = 0
     n = 0
     while n < 99:
-        number_of_n = max_spacings_list.count(n)
+        number_of_n = ax_spacing_list_totals[n]
         max_spacings_count_list.append(number_of_n)
         total += number_of_n
         if total == number_of_teams:
@@ -176,7 +202,7 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
                 add_team_numbers = False
             
             if add_team_numbers:
-                team_list_text = get_team_list_text_when_number_matches(min_spacings_list, n)
+                team_list_text = get_team_list_text_when_number_matches_dict(min_spacings_list, n)
             else:
                 team_list_text = ""
             min_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}{team_list_text}\n"
@@ -205,7 +231,7 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
                 add_team_numbers = False
 
             if add_team_numbers:
-                team_list_text = get_team_list_text_when_number_matches(max_spacings_list, n)
+                team_list_text = get_team_list_text_when_number_matches_dict(max_spacings_list, n)
             else:
                 team_list_text = ""
             max_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}{team_list_text}\n"
@@ -247,7 +273,7 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
             #Minimum stuff:     [team_num, min_spacing, count]
             output_text += "\n  Team    Min   Count"
             min_spacing_detailed_list = []
-            for n, spacings_data in enumerate(spacings_data_all):
+            for n, spacings_data in spacings_data_all.items():
                 min_spacing = min_spacings_list[n]
                 spacing_count = spacings_data.count(min_spacing)
                 add_array = [n+1, min_spacing, spacing_count, 100*min_spacing-spacing_count]
@@ -276,7 +302,7 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
                 n += 1
             closest_to_target = round(closest_to_target, 2)
             av_spacing_detailed_list = []
-            for n, spacings_data in enumerate(spacings_data_all):
+            for n, spacings_data in spacings_data_all.items():
                 av_spacing = av_value_from_list(spacings_data)
                 add_array = [n+1, round(av_spacing,5)]
                 av_spacing_detailed_list.append(add_array)
@@ -293,7 +319,7 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
             #Maximum stuff:     [team_num, max_spacing, count]
             output_text += "\n  Team    Max   Count"
             max_spacing_detailed_list = []
-            for n, spacings_data in enumerate(spacings_data_all):
+            for n, spacings_data in spacings_data_all.items():
                 max_spacing = max_spacings_list[n]
                 spacing_count = spacings_data.count(max_spacing)
                 add_array = [n+1, max_spacing, spacing_count, 100*max_spacing+spacing_count]
@@ -321,36 +347,34 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
         else:
             #Minimum stuff:     [team_num, min_spacing, count]
             min_spacing_detailed_list = []
-            for n, spacings_data in enumerate(spacings_data_all):
+            for n, spacings_data in spacings_data_all.items():
                 min_spacing = min_spacings_list[n]
                 spacing_count = spacings_data.count(min_spacing)
-                add_array = [n+1, min_spacing, spacing_count, 100*min_spacing-spacing_count]
+                add_array = [n, min_spacing, spacing_count, 100*min_spacing-spacing_count]
                 min_spacing_detailed_list.append(add_array)
             min_spacing_detailed_list_sorted_by_team = min_spacing_detailed_list.copy()
             min_spacing_detailed_list = order_array_list(min_spacing_detailed_list.copy(), 3)
 
             #Average stuff:     [team_num, average_spacing]
             closest_to_target = 999999
-            n = 0
-            while n < len(av_spacings_list):
-                if abs(target_spacing-av_spacings_list[n]) < closest_to_target:
-                    closest_to_target = abs(target_spacing-av_spacings_list[n])
-                n += 1
+            for value in av_spacings_list.values():
+                if abs(target_spacing-value) < closest_to_target:
+                    closest_to_target = abs(target_spacing-value)
             closest_to_target = round(closest_to_target, 2)
             av_spacing_detailed_list = []
-            for n, spacings_data in enumerate(spacings_data_all):
+            for n, spacings_data in spacings_data_all.items():
                 av_spacing = av_value_from_list(spacings_data)
-                add_array = [n+1, round(av_spacing,5)]
+                add_array = [n, round(av_spacing,5)]
                 av_spacing_detailed_list.append(add_array)
             av_spacing_detailed_list_sorted_by_team = av_spacing_detailed_list.copy()
             av_spacing_detailed_list = order_array_list(av_spacing_detailed_list.copy(), 1, False)
 
             #Maximum stuff:     [team_num, max_spacing, count]
             max_spacing_detailed_list = []
-            for n, spacings_data in enumerate(spacings_data_all):
+            for n, spacings_data in spacings_data_all.items():
                 max_spacing = max_spacings_list[n]
                 spacing_count = spacings_data.count(max_spacing)
-                add_array = [n+1, max_spacing, spacing_count, 100*max_spacing+spacing_count]
+                add_array = [n, max_spacing, spacing_count, 100*max_spacing+spacing_count]
                 max_spacing_detailed_list.append(add_array)
             max_spacing_detailed_list_sorted_by_team = max_spacing_detailed_list.copy()
             max_spacing_detailed_list = order_array_list(max_spacing_detailed_list.copy(), 3, True)
@@ -416,7 +440,7 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
             output_text += f"\n  {colour_text('Team','blue')}       Min            Av         Max           Spacings"   #For when count is in brackets.
 
             for n, row in enumerate(min_spacing_detailed_list_sorted_by_team):
-                team_number = n+1
+                team_number = min_spacing_detailed_list_sorted_by_team[n][0]
                 min_spacing = min_spacing_detailed_list_sorted_by_team[n][1]
                 min_spacing_count = min_spacing_detailed_list_sorted_by_team[n][2]
                 if min_spacing == strong_alert_level_low:
@@ -455,7 +479,7 @@ def spacing_check(match_schedule, summary_of_checks, detailed=False):
                 max_spacing_text = f"{max_spacing} {max_spacing_count:>4}"     #For when count is in brackets
 
 
-                spacings_data = spacings_data_all[n]
+                spacings_data = spacings_data_all[team_number]
                 spacing_text = ""
                 for spacing in spacings_data:
                     spacing_text += f"{spacing:>2}, "
@@ -526,17 +550,20 @@ def get_appearances_data(match_schedule, specific_team_number, in_blocks=False):
 
     return appearances
 
-def facings_check(match_schedule, summary_of_checks, detailed=False):
+def facings_check(match_schedule, summary_of_checks, exclude_teams_list, detailed=False):
     number_of_teams = get_number_of_teams_from_schedule(match_schedule)
     number_of_appearances = get_appearances_from_schedule(match_schedule)
     output_text = "\n## Facings\n"
     output_text += "\n#### This looks at whether a team has faced another team and how often they have done so.\n"
-    facings_data_all = []
+    facings_data_all = {}
     list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule)
+    list_of_team_numbers_for_repeats = get_list_of_team_numbers_from_schedule(match_schedule)
     for team_number in list_of_team_numbers:
-        facings_data = get_facings_data(match_schedule, team_number)
-        # print(f"{team_number}: {facings_data}")
-        facings_data_all.append(facings_data)
+        if not team_number in exclude_teams_list:
+            facings_data = get_facings_data(match_schedule, team_number)
+            # print(f"{team_number}: {facings_data}")
+            # facings_data_all.append(facings_data)
+            facings_data_all[team_number] = facings_data
     
     number_of_teams_per_match = get_number_of_teams_per_match_from_schedule(match_schedule)
     best_faces = number_of_appearances*(number_of_teams_per_match-1)
@@ -556,7 +583,7 @@ def facings_check(match_schedule, summary_of_checks, detailed=False):
     while n >= 0:
         total_teams = 0
         total_teams_list = []
-        for m in range(number_of_teams):
+        for m in facings_data_all.keys():
             facings_data = facings_data_all[m]
             total_non_zero = 0
             for q in range(number_of_appearances):
@@ -564,7 +591,7 @@ def facings_check(match_schedule, summary_of_checks, detailed=False):
             
             if total_non_zero == n:
                 total_teams += 1
-                total_teams_list.append(m+1)
+                total_teams_list.append(m)
         
         if total_teams > 0:
             text_to_add = f" faces {n:>3} {f'({number_of_teams-1-n})':>5}: {total_teams:>3} teams"
@@ -630,13 +657,16 @@ def facings_check(match_schedule, summary_of_checks, detailed=False):
     weak_alert_level_repeats = target_repeats+1
     strong_alert_level_repeats_count, medium_alert_level_repeats_count, weak_alert_level_repeats_count = 0, 0, 0
 
+    for team_number in exclude_teams_list:
+        list_of_team_numbers_for_repeats.remove(team_number)
+
     for q in range(number_of_appearances+1):
         number_of_teams_at_q = 0
         list_of_teams_at_q = []
-        for m in range(number_of_teams):
+        for m in facings_data_all.keys():
             if facings_data_all[m][q] > 0:
                 number_of_teams_at_q += 1
-                list_of_teams_at_q.append(m+1)
+                list_of_teams_at_q.append(m)
         
         if number_of_teams_at_q > 0:
             if q > strong_alert_level_repeats:
@@ -657,10 +687,10 @@ def facings_check(match_schedule, summary_of_checks, detailed=False):
             
             text_to_add = colour_text(f" {number_of_teams_at_q:>3} teams face at least 1 team {q:>2} times", colour)
             if add_team_numbers:
-                if number_of_teams_at_q == number_of_teams:
+                if number_of_teams_at_q == number_of_teams-len(exclude_teams_list):
                     team_list_text = " (All teams)"
-                elif number_of_teams_at_q > number_of_teams-5:
-                    opposite_list = get_team_numbers_not_in_list(number_of_teams, list_of_teams_at_q)
+                elif number_of_teams_at_q > number_of_teams-len(exclude_teams_list)-5:
+                    opposite_list = get_team_numbers_not_in_list(list_of_team_numbers_for_repeats, list_of_teams_at_q)
                     team_list_text = f" (All except: {tidy_list_of_team_numbers(opposite_list)[2:]}"
                 else:
                     team_list_text = tidy_list_of_team_numbers(list_of_teams_at_q)
@@ -696,12 +726,12 @@ def facings_check(match_schedule, summary_of_checks, detailed=False):
 
         facings_info_array = []
 
-        for n, facings_data in enumerate(facings_data_all):
+        for n, facings_data in facings_data_all.items():
             total_non_zero = 0
             for q in range(number_of_appearances):
                 total_non_zero += facings_data[q+1]
             
-            facings_info_array.append([n+1, total_non_zero, number_of_teams-1-total_non_zero])
+            facings_info_array.append([n, total_non_zero, number_of_teams-1-total_non_zero])
         
         facings_info_array = order_array_list(facings_info_array, 1, False)
         for row in facings_info_array:
@@ -731,10 +761,10 @@ def facings_check(match_schedule, summary_of_checks, detailed=False):
                 colour = None
             facings_repeats_array = []
             all_zero = True
-            for n, facings_data in enumerate(facings_data_all):
+            for n, facings_data in facings_data_all.items():
                 if facings_data[m] > 0:
                     all_zero = False
-                facings_repeats_array.append([n+1, facings_data[m]])
+                facings_repeats_array.append([n, facings_data[m]])
             
             facings_repeats_array = order_array_list(facings_repeats_array, 1, True)
 
@@ -749,27 +779,31 @@ def facings_check(match_schedule, summary_of_checks, detailed=False):
 
     return output_text, summary_of_checks
 
-def appearances_check(match_schedule, summary_of_checks, detailed=False):
+def appearances_check(match_schedule, summary_of_checks, exclude_teams_list, detailed=False):
     list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule)
-    number_of_teams = get_number_of_teams_from_schedule(match_schedule)
-    appearances_list = []
+    number_of_teams = get_number_of_teams_from_schedule(match_schedule)-len(exclude_teams_list)
+    appearances_list = {}
     output_text = "\n## Appearances\n"
     output_text += "\n#### This looks at how many matches a team has. Every team should play the same number of matches.\n"
     output_text += "\nNumber of appearances for each team:\n"
 
     for team_number in list_of_team_numbers:
-        appearances_list.append(get_appearances_data(match_schedule, team_number))
+        if not team_number in exclude_teams_list:
+            appearances_list[team_number] = get_appearances_data(match_schedule, team_number)
+            # appearances_list.append(get_appearances_data(match_schedule, team_number))
     
     list_of_appearance_numbers = []
-    for appearance_count in appearances_list:
+    for appearance_count in appearances_list.values():
         if not appearance_count in list_of_appearance_numbers:
             list_of_appearance_numbers.append(appearance_count)
     
     appearances_and_team_count = []
     red_appearances = False
 
+    appearances_list_totals = Counter(appearances_list.values())
+
     for appearance_count in list_of_appearance_numbers:
-        appearances_and_team_count.append([appearance_count, appearances_list.count(appearance_count)])
+        appearances_and_team_count.append([appearance_count, appearances_list_totals[appearance_count]])
     
     if len(appearances_and_team_count) == 1 and appearances_and_team_count[0][1] == number_of_teams:
         text_to_add = f" {appearances_and_team_count[0][0]:>2} appearances: {appearances_and_team_count[0][1]:>3} teams"
@@ -788,7 +822,7 @@ def appearances_check(match_schedule, summary_of_checks, detailed=False):
                 team_list_text = ""
             else:
                 colour = "red"
-                team_list_text = get_team_list_text_when_number_matches(appearances_list, item[0])
+                team_list_text = get_team_list_text_when_number_matches_dict(appearances_list, item[0])
             output_text += colour_text(f"{text_to_add}", colour)
             output_text += f"{team_list_text}\n"
             red_appearances = True
@@ -825,7 +859,7 @@ def get_number_of_non_four_robot_matches(match_schedule):
             number_of_one_robot_matches += 1
     return number_of_three_robot_matches, number_of_two_robot_matches, number_of_one_robot_matches, teams_in_three_robots_matches
 
-def non_four_robot_match_check(match_schedule, summary_of_checks, detailed=False):
+def non_four_robot_match_check(match_schedule, summary_of_checks, exclude_teams_list, detailed=False):
     output_text = "\n## Matches that do not contain 4 Robots\n"
     output_text += "\n#### Sometimes matches containing only 3 robots are required to fill the schedule. This checks that there are not more of these matches than are required."
     output_text += "\n#### However, 1 or 2 robot matches should never be required or aimed for (use 3 robot matches instead), so this also checks to see if any of those are present.\n"
@@ -833,7 +867,7 @@ def non_four_robot_match_check(match_schedule, summary_of_checks, detailed=False
     number_of_teams_per_match = get_number_of_teams_per_match_from_schedule(match_schedule)
     list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule)
 
-    number_of_teams = get_number_of_teams_from_schedule(match_schedule)
+    number_of_teams = get_number_of_teams_from_schedule(match_schedule)-len(exclude_teams_list)
     number_of_appearances = get_appearances_from_schedule(match_schedule)
     if number_of_teams*number_of_appearances % 4 == 0:
         fake_teams_to_add = 0
@@ -926,7 +960,8 @@ def non_four_robot_match_check(match_schedule, summary_of_checks, detailed=False
         output_text += "\nNumber of times each team is present in 3 robot matches:"
         info_array = []
         for team_number in list_of_team_numbers:
-            info_array.append([team_number, teams_in_three_robots_matches[team_number]])
+            if not team_number in exclude_teams_list:
+                info_array.append([team_number, teams_in_three_robots_matches[team_number]])
         
         info_array = order_array_list(info_array, 1, True)
 
@@ -1051,7 +1086,7 @@ def get_overlap_data(match_schedule, in_blocks=False):
     
     return match_lists_3, match_lists_4
 
-def overlap_check(match_schedule, summary_of_checks, detailed=False):
+def overlap_check(match_schedule, summary_of_checks, exclude_teams_list, detailed=False):
     output_text = "\n## Overlapping matches\n"
     output_text += "\n#### This looks at matches that partially overlap (3 out of the 4 teams are the same) and matches that fully overlap (all 4 teams are the same)\n"
 
@@ -1150,7 +1185,7 @@ def overlap_check(match_schedule, summary_of_checks, detailed=False):
 
     return output_text, summary_of_checks
 
-def teams_in_match_multiple_times_check(match_schedule, summary_of_checks, detailed=False):
+def teams_in_match_multiple_times_check(match_schedule, summary_of_checks, exclude_teams_list, detailed=False):
     output_text = "\n## Team Number in a single match multiple times\n"
     output_text += "\n#### Checks to make sure a single team number does not appear in a match multiple times.\n"
     list_data = get_teams_in_match_multiple_times_data(match_schedule)
@@ -1191,18 +1226,21 @@ def get_corners_data(match_schedule, specific_team_number, in_blocks=False):
                 corners_data[pos] += 1
     return corners_data
 
-def corners_check(match_schedule, summary_of_checks, detailed=False):
+def corners_check(match_schedule, summary_of_checks, exclude_teams_list, detailed=False):
     output_text = "\n## Starting Zone Allocations Check\n"
     output_text += "\n#### This checks that teams start in a roughly even proportion of the starting zones.\n"
-    number_of_teams = get_number_of_teams_from_schedule(match_schedule)
+    number_of_teams = get_number_of_teams_from_schedule(match_schedule)-len(exclude_teams_list)
     list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule)
     number_of_teams_per_match = get_number_of_teams_per_match_from_schedule(match_schedule)
-    corners_data_all = []
+    corners_data_all = {}
     std_all = []
+    std_all_dict = {}
     for specific_team_number in list_of_team_numbers:
-        corners_data = get_corners_data(match_schedule, specific_team_number)
-        corners_data_all.append(corners_data)
-        std_all.append(statistics.stdev(corners_data))
+        if not specific_team_number in exclude_teams_list:
+            corners_data = get_corners_data(match_schedule, specific_team_number)
+            corners_data_all[specific_team_number] = corners_data
+            std_all.append(statistics.stdev(corners_data))
+            std_all_dict[specific_team_number] = statistics.stdev(corners_data)
 
     fake_corners_data = []
 
@@ -1297,8 +1335,8 @@ def corners_check(match_schedule, summary_of_checks, detailed=False):
     if detailed:
         output_text += "\nDetailed zones data:"
         detailed_std_array = []
-        for n in range(number_of_teams):
-            detailed_std_array.append([n+1, std_all[n], corners_data_all[n]])
+        for n in corners_data_all.keys():
+            detailed_std_array.append([n, std_all_dict[n], corners_data_all[n]])
         
         detailed_std_array = order_array_list(detailed_std_array, 1, True)
         for row in detailed_std_array:
@@ -1325,7 +1363,7 @@ def corners_check(match_schedule, summary_of_checks, detailed=False):
     return output_text, summary_of_checks
 
 
-def print_summary_of_checks(match_schedule, summary_of_checks):
+def print_summary_of_checks(match_schedule, summary_of_checks, exclude_teams_list):
     summary_of_checks_text = colour_text("\n## Summary of Checks\n\n", "blue")
     summary_of_checks_text = colour_text(summary_of_checks_text, "bold")
     print(summary_of_checks_text)
@@ -1338,7 +1376,12 @@ def print_summary_of_checks(match_schedule, summary_of_checks):
         arena_s = ""
     else:
         arena_s = "s"
-    print(f" {number_of_teams:>3} Teams\n {number_of_appearances:>3} Appearances per team\n {number_of_matches:>3} Matches, with {number_of_teams_per_match} teams per match, across {NUMBER_OF_ARENAS} Arena{arena_s}.\n\n")
+    print(f" {number_of_teams:>3} Teams\n {number_of_appearances:>3} Appearances per team\n {number_of_matches:>3} Matches, with {number_of_teams_per_match} teams per match, across {NUMBER_OF_ARENAS} Arena{arena_s}.")
+    if len(exclude_teams_list) > 0:
+        print(colour_text(f"\nNOTE: Some team numbers have been excluded from these checks", "red"))
+        print(f"  Team numbers excluded from checks: {tidy_list_of_team_numbers(exclude_teams_list)[2:-1]}")
+
+    print("\n")
 
     time.sleep(0.75)
 
@@ -1389,37 +1432,37 @@ def collate_summary_of_checks(match_schedule, summary_of_checks):
         summary_of_checks_text += "\n"
     return summary_of_checks_text
 
-def run_all_checks(match_schedule, detailed=False):
+def run_all_checks(match_schedule, exclude_teams_list, detailed=False):
     summary_of_checks = [[], [], [], []]
     #order is red, orange, yellow, green, (dark green?)
     number_of_teams_per_match = get_number_of_teams_per_match_from_schedule(match_schedule)
     output_text_all = ""
-    text_to_add, summary_of_checks = appearances_check(match_schedule, summary_of_checks, detailed)
+    text_to_add, summary_of_checks = appearances_check(match_schedule, summary_of_checks, exclude_teams_list, detailed)
     output_text_all += text_to_add
-    text_to_add, summary_of_checks = teams_in_match_multiple_times_check(match_schedule, summary_of_checks, detailed)
+    text_to_add, summary_of_checks = teams_in_match_multiple_times_check(match_schedule, summary_of_checks, exclude_teams_list, detailed)
     output_text_all += text_to_add
-    text_to_add, summary_of_checks = non_four_robot_match_check(match_schedule, summary_of_checks, detailed)
+    text_to_add, summary_of_checks = non_four_robot_match_check(match_schedule, summary_of_checks, exclude_teams_list, detailed)
     output_text_all += text_to_add
-    text_to_add, summary_of_checks = spacing_check(match_schedule, summary_of_checks, detailed)
+    text_to_add, summary_of_checks = spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detailed)
     output_text_all += text_to_add
-    text_to_add, summary_of_checks = facings_check(match_schedule, summary_of_checks, detailed)
+    text_to_add, summary_of_checks = facings_check(match_schedule, summary_of_checks, exclude_teams_list, detailed)
     output_text_all += text_to_add
     if number_of_teams_per_match == 4:
-        text_to_add, summary_of_checks = overlap_check(match_schedule, summary_of_checks, detailed)
+        text_to_add, summary_of_checks = overlap_check(match_schedule, summary_of_checks, exclude_teams_list, detailed)
         output_text_all += text_to_add
-    text_to_add, summary_of_checks = corners_check(match_schedule, summary_of_checks, detailed)
+    text_to_add, summary_of_checks = corners_check(match_schedule, summary_of_checks, exclude_teams_list, detailed)
     output_text_all += text_to_add
     return output_text_all, summary_of_checks
 
-def interact_with_checks(match_schedule):
-    output_text_all, summary_of_checks = run_all_checks(match_schedule, False)
-    print_summary_of_checks(match_schedule, summary_of_checks)
+def interact_with_checks(match_schedule, exclude_teams_list=[]):
+    output_text_all, summary_of_checks = run_all_checks(match_schedule, exclude_teams_list, False)
+    print_summary_of_checks(match_schedule, summary_of_checks, exclude_teams_list)
 
     response = input("\nWould you like to see the basic overview of all the checks? (Y/N): ")
 
     if response.casefold()[:1] == "y":
         print(output_text_all)
-        output_text_all, summary_of_checks = run_all_checks(match_schedule, True)
+        output_text_all, summary_of_checks = run_all_checks(match_schedule, exclude_teams_list, True)
         repeat_detailed_checks = True
         while repeat_detailed_checks:
             print("\nWould you like to see a detailed version of some/all of the checks?")
@@ -1430,26 +1473,40 @@ def interact_with_checks(match_schedule):
             if lower == "y" or lower == "a":
                 print(output_text_all)
                 repeat_detailed_checks = False
+            elif lower == "e":
+                exclude_text = input("\nNumbers to exclude: ")
+                exclude_teams_list = number_array_from_list(exclude_text)
+                output_text_all, summary_of_checks = run_all_checks(match_schedule, exclude_teams_list, False)
+                print_summary_of_checks(match_schedule, summary_of_checks, exclude_teams_list)
+
+                response = input("\nWould you like to see the basic overview of all the checks? (Y/N): ")
+                if response.casefold()[:1] == "y":
+                    print(output_text_all)
+                elif response.casefold()[:1] == "d":
+                    output_text_all, summary_of_checks = run_all_checks(match_schedule, True)
+                    print(output_text_all)
+                else:
+                    repeat_detailed_checks = False
             elif lower == "f":
-                text_to_add, summary_of_checks = facings_check(match_schedule, summary_of_checks, True)
+                text_to_add, summary_of_checks = facings_check(match_schedule, summary_of_checks, exclude_teams_list, True)
                 print(text_to_add)
             elif lower == "m":
-                text_to_add, summary_of_checks = teams_in_match_multiple_times_check(match_schedule, summary_of_checks, True)
+                text_to_add, summary_of_checks = teams_in_match_multiple_times_check(match_schedule, summary_of_checks, exclude_teams_list, True)
                 print(text_to_add)
             elif lower == "n":
-                text_to_add, summary_of_checks = non_four_robot_match_check(match_schedule, summary_of_checks, True)
+                text_to_add, summary_of_checks = non_four_robot_match_check(match_schedule, summary_of_checks, exclude_teams_list, True)
                 print(text_to_add)
             elif lower == "o":
-                text_to_add, summary_of_checks = overlap_check(match_schedule, summary_of_checks, True)
+                text_to_add, summary_of_checks = overlap_check(match_schedule, summary_of_checks, exclude_teams_list, True)
                 print(text_to_add)
             elif lower == "p":
-                text_to_add, summary_of_checks = appearances_check(match_schedule, summary_of_checks, True)
+                text_to_add, summary_of_checks = appearances_check(match_schedule, summary_of_checks, exclude_teams_list, True)
                 print(text_to_add)
             elif lower == "s":
-                text_to_add, summary_of_checks = spacing_check(match_schedule, summary_of_checks, True)
+                text_to_add, summary_of_checks = spacing_check(match_schedule, summary_of_checks, exclude_teams_list, True)
                 print(text_to_add)
             elif lower == "z":
-                text_to_add, summary_of_checks = corners_check(match_schedule, summary_of_checks, True)
+                text_to_add, summary_of_checks = corners_check(match_schedule, summary_of_checks, exclude_teams_list, True)
                 print(text_to_add)
             else:
                 repeat_detailed_checks = False
@@ -1465,7 +1522,7 @@ These are useful for checking all the different check features are working as ex
 """
 # location = "Test Schedules/test_23_8_awful2.txt"                       #3,2,1 robot match concerns; unequal appearances; team number in same match twice; no perfect sections.
 # location = "Test Schedules/schedule_t12-a4.txt"                        #All concerns for minimum spacing.
-# location = "Test Schedules/SR2024-final-schedule.txt"                  #Strong and weak concerns for both minimum and maximum spacing.
+location = "Test Schedules/SR2024-final-schedule.txt"                  #Strong and weak concerns for both minimum and maximum spacing.
 # location = "Test Schedules/SR2024-final-schedule_optimised.txt"        #Perfect facings.
 # location = "Test Schedules/SR2023-yabms-36.txt"                        #Perfect corner standard deviation.
 # location = "Test Schedules/schedule_t24-a12_2.txt"                     #Terrible corner standard deviation.

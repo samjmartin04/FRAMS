@@ -304,6 +304,19 @@ def get_team_list_text_when_number_matches(info_array, number_to_match_with):
     team_list_text += ")"
     return team_list_text
 
+def get_team_list_text_when_number_matches_dict(info_dict, number_to_match_with):
+    """
+    Takes an array with info in it (ordered such that index 0 is team 1) and returns a list with every team number that matches the number_to_match_with value
+    """
+    team_list_text = " ("
+    for m, spacing in info_dict.items():
+        if spacing == number_to_match_with:
+            team_list_text += f"{m}, "
+    
+    team_list_text = team_list_text[:-2]
+    team_list_text += ")"
+    return team_list_text
+
 def tidy_list_of_team_numbers(info_array):
     """
     Takes an array in [] form and convert it into () form.
@@ -316,10 +329,9 @@ def tidy_list_of_team_numbers(info_array):
     team_list_text += ")"
     return team_list_text
 
-def get_team_numbers_not_in_list(number_of_teams, list_to_exclude):
-    list_of_teams_numbers = get_list_of_team_numbers(number_of_teams)
+def get_team_numbers_not_in_list(list_of_team_numbers, list_to_exclude):
     output_array = []
-    for team_number in list_of_teams_numbers:
+    for team_number in list_of_team_numbers:
         if not team_number in list_to_exclude:
             output_array.append(team_number)
     return output_array

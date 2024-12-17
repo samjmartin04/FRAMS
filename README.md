@@ -61,6 +61,8 @@ If a problem is highlighted or you would like to look in more detail, press 'Y' 
 
 If you then want to look in even further detail, you can press 'Y' and then enter again to see the detailed version of all of these checks. The overview will be listed as before, followed by the extra detail, which should help further find the problem or analyse the schedule. If you only wish to look at a specific section in detail, you can enter a different letter corresponding to that section to just view that section in detail.
 
+On this detailed checks part, you can enter the letter 'E' for 'Exclude' to exclude specific team numbers (separated by commas) from the checks. Most of the checks will then exclude these team numbers from their checks and assume that these teams do not exist at all. Facings will still assume the original number of teams however, so are not as accurate in this case. If the checks are currently excluding teams and you wish to not exclude any teams, do not enter anything when asked 'Number to exclude:' and all the team numbers will be included.
+
 ### Number of appearances
 
 Every team must have the same number of appearances to have a fair match schedule.
@@ -169,7 +171,7 @@ Note: optimising a schedule will mix any (league) blocks in your schedule. If yo
 
 This features enables you to add additional matches to an already existing schedule. This allows for adding a few more appearances to a schedule without having to completely generate a new one. Depending on the number of teams and number of appearances to add, this may result in more than the optimal number of 3 robot matches than would be expected for the overall numbers of appearances for the number of teams in the whole schedule. If no location is given for the new schedule, it will use the name of the schedule it is based on with '_extended' at the end. The number of matches or number of appearances which is used to crop the schedules checks that it gives an equal number of appearances for each team or a whole number of matches respectively. If this does not happen, the number of matches in the crop is increased until every team has the same number of appearances (if possible).
 
-The additional matches being added do not have to have the same number of teams as the already existing matches. You could use this to add a team back in after the schedule has started or remove a team that drops out after it has started. Note that changing the number of teams will affect the usefulness (and sometimes accuracy) of the checks at the end.
+The additional matches being added do not have to have the same number of teams as the already existing matches. You could use this to add a team back in after the schedule has started or remove a team that drops out after it has started. When changing the number of teams, the checks that follow will automatically have the teams that have been added or removed from the schedule excluded from the checks. Most of the checks will then exclude these team numbers from their checks and assume that these teams do not exist at all. Facings will still assume the original number of teams however, so are not as accurate in this case. To add them back in, view the basic overview of checks, then enter 'E' under the detail part, then press enter without entering anything when asked which teams you would like to exclude.
 
 Note: cropping at a multiple of 4 number of appearances is much more likely for the crop to succeed and not give teams in the cropped schedule unequal numbers of appearances.
 
