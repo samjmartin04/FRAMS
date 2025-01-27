@@ -98,39 +98,49 @@ def get_overall_overlap_score_from_schedule(match_schedule, in_blocks=False):
         for league_block in match_schedule:
             for match in league_block:
                 match_temp = match.copy()
-                match_temp_1 = order_list_insert(match_temp)
+                match_temp_1 = match_temp
+                match_temp_1.sort()
                 match_list_4_all.append(match_temp_1)
                 match_list_4_unique.add(tuple(match_temp_1))
                 
-                match_temp_1 = order_list_insert([match_temp[0], match_temp[1], match_temp[2]])
+                match_temp_1 = [match_temp[0], match_temp[1], match_temp[2]]
+                match_temp_1.sort()
                 match_list_3_all.append(match_temp_1)
                 match_list_3_unique.add(tuple(match_temp_1))
-                match_temp_1 = order_list_insert([match_temp[0], match_temp[1], match_temp[3]])
+                match_temp_1 = [match_temp[0], match_temp[1], match_temp[3]]
+                match_temp_1.sort()
                 match_list_3_all.append(match_temp_1)
                 match_list_3_unique.add(tuple(match_temp_1))
-                match_temp_1 = order_list_insert([match_temp[0], match_temp[2], match_temp[3]])
+                match_temp_1 = [match_temp[0], match_temp[2], match_temp[3]]
+                match_temp_1.sort()
                 match_list_3_all.append(match_temp_1)
                 match_list_3_unique.add(tuple(match_temp_1))
-                match_temp_1 = order_list_insert([match_temp[1], match_temp[2], match_temp[3]])
+                match_temp_1 = [match_temp[1], match_temp[2], match_temp[3]]
+                match_temp_1.sort()
                 match_list_3_all.append(match_temp_1)
                 match_list_3_unique.add(tuple(match_temp_1))
     else:
         for match in match_schedule:
             match_temp = match.copy()
-            match_temp_1 = order_list_insert(match_temp)
+            match_temp_1 = match_temp
+            match_temp_1.sort()
             match_list_4_all.append(match_temp_1)
             match_list_4_unique.add(tuple(match_temp_1))
             
-            match_temp_1 = order_list_insert([match_temp[0], match_temp[1], match_temp[2]])
+            match_temp_1 = [match_temp[0], match_temp[1], match_temp[2]]
+            match_temp_1.sort()
             match_list_3_all.append(match_temp_1)
             match_list_3_unique.add(tuple(match_temp_1))
-            match_temp_1 = order_list_insert([match_temp[0], match_temp[1], match_temp[3]])
+            match_temp_1 = [match_temp[0], match_temp[1], match_temp[3]]
+            match_temp_1.sort()
             match_list_3_all.append(match_temp_1)
             match_list_3_unique.add(tuple(match_temp_1))
-            match_temp_1 = order_list_insert([match_temp[0], match_temp[2], match_temp[3]])
+            match_temp_1 = [match_temp[0], match_temp[2], match_temp[3]]
+            match_temp_1.sort()
             match_list_3_all.append(match_temp_1)
             match_list_3_unique.add(tuple(match_temp_1))
-            match_temp_1 = order_list_insert([match_temp[1], match_temp[2], match_temp[3]])
+            match_temp_1 = [match_temp[1], match_temp[2], match_temp[3]]
+            match_temp_1.sort()
             match_list_3_all.append(match_temp_1)
             match_list_3_unique.add(tuple(match_temp_1))
 
@@ -757,9 +767,9 @@ def generate_schedule(number_of_teams, number_of_appearances, optimisation_level
 
     time_taken_total = time_taken_spacing + time_taken_facings + time_taken_overlap + time_taken_shuffling
     print("\nTime taken Summary:")
-    print(f"Spacing: {round(time_taken_spacing,1):5.1f}s, {round(100*time_taken_spacing/time_taken_total,1):4.1f}%")
-    print(f"Facings: {round(time_taken_facings,1):5.1f}s, {round(100*time_taken_facings/time_taken_total,1):4.1f}%")
-    print(f"Overlap: {round(time_taken_overlap,1):5.1f}s, {round(100*time_taken_overlap/time_taken_total,1):4.1f}%")
+    print(f"Spacing  : {round(time_taken_spacing,1):5.1f}s, {round(100*time_taken_spacing/time_taken_total,1):4.1f}%")
+    print(f"Facings  : {round(time_taken_facings,1):5.1f}s, {round(100*time_taken_facings/time_taken_total,1):4.1f}%")
+    print(f"Overlap  : {round(time_taken_overlap,1):5.1f}s, {round(100*time_taken_overlap/time_taken_total,1):4.1f}%")
     print(f"Shuffling: {round(time_taken_shuffling,1):5.1f}s, {round(100*time_taken_shuffling/time_taken_total,1):4.1f}%")
 
     return match_schedule
@@ -810,7 +820,7 @@ def check_score_schedules():
 
 
 if __name__ == '__main__':
-    # check_score_schedules()
+    #check_score_schedules()
  
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--teams", type=int, help="Number of teams required", required=True)
