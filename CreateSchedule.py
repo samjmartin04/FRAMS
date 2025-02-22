@@ -16,8 +16,10 @@ def get_overall_corner_score_from_schedule(match_schedule, in_blocks=False):
     overall_score = 0
     for specific_team_number in list_of_team_numbers:
         #get_corner_score()
-        target_number = get_appearances_from_schedule(match_schedule, in_blocks)/4
-        corners_data = [0, 0, 0, 0]
+        target_number = get_appearances_from_schedule(match_schedule, in_blocks)/NUMBER_OF_TEAMS_PER_MATCH
+        corners_data = []
+        for _ in range(NUMBER_OF_TEAMS_PER_MATCH):
+            corners_data.append(0)
         if in_blocks:
             for league_block in match_schedule:
                 for match in league_block:
@@ -43,7 +45,7 @@ def get_overall_facings_score_from_schedule(match_schedule, in_blocks=False):
     list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule, in_blocks)
     number_of_teams = get_number_of_teams_from_schedule(match_schedule, in_blocks)
     number_of_appearances = get_appearances_from_schedule(match_schedule, in_blocks)
-    target_repeats = 3*number_of_appearances/number_of_teams
+    target_repeats = (NUMBER_OF_TEAMS_PER_MATCH-1)*number_of_appearances/number_of_teams
     #get_facings_data()
     facings_data = {}
     for team_number in list_of_team_numbers:
@@ -90,13 +92,38 @@ def get_overall_facings_score_from_schedule(match_schedule, in_blocks=False):
 
 def get_overall_overlap_score_from_schedule(match_schedule, in_blocks=False):
     #get_overlap_data()
-    match_list_3_all = []
-    match_list_4_all = []
-    match_list_3_unique = set()
-    match_list_4_unique = set()
-    if in_blocks:
-        for league_block in match_schedule:
-            for match in league_block:
+    if NUMBER_OF_TEAMS_PER_MATCH == 4:
+        match_list_3_all = []
+        match_list_4_all = []
+        match_list_3_unique = set()
+        match_list_4_unique = set()
+        if in_blocks:
+            for league_block in match_schedule:
+                for match in league_block:
+                    match_temp = match.copy()
+                    match_temp_1 = match_temp
+                    match_temp_1.sort()
+                    match_list_4_all.append(match_temp_1)
+                    match_list_4_unique.add(tuple(match_temp_1))
+                    
+                    match_temp_1 = [match_temp[0], match_temp[1], match_temp[2]]
+                    match_temp_1.sort()
+                    match_list_3_all.append(match_temp_1)
+                    match_list_3_unique.add(tuple(match_temp_1))
+                    match_temp_1 = [match_temp[0], match_temp[1], match_temp[3]]
+                    match_temp_1.sort()
+                    match_list_3_all.append(match_temp_1)
+                    match_list_3_unique.add(tuple(match_temp_1))
+                    match_temp_1 = [match_temp[0], match_temp[2], match_temp[3]]
+                    match_temp_1.sort()
+                    match_list_3_all.append(match_temp_1)
+                    match_list_3_unique.add(tuple(match_temp_1))
+                    match_temp_1 = [match_temp[1], match_temp[2], match_temp[3]]
+                    match_temp_1.sort()
+                    match_list_3_all.append(match_temp_1)
+                    match_list_3_unique.add(tuple(match_temp_1))
+        else:
+            for match in match_schedule:
                 match_temp = match.copy()
                 match_temp_1 = match_temp
                 match_temp_1.sort()
@@ -119,38 +146,18 @@ def get_overall_overlap_score_from_schedule(match_schedule, in_blocks=False):
                 match_temp_1.sort()
                 match_list_3_all.append(match_temp_1)
                 match_list_3_unique.add(tuple(match_temp_1))
+
+        number_of_overlaps_3 = len(match_list_3_all)-len(match_list_3_unique)
+        number_of_overlaps_4 = len(match_list_4_all)-len(match_list_4_unique)
+
+        #overlap_score()
+        weighting = 0
+        weighting += number_of_overlaps_3*OVERLAP_3_WEIGHTING*3
+        weighting += number_of_overlaps_4*OVERLAP_4_WEIGHTING*4
+    elif NUMBER_OF_TEAMS_PER_MATCH == 2:
+        weighting = 0
     else:
-        for match in match_schedule:
-            match_temp = match.copy()
-            match_temp_1 = match_temp
-            match_temp_1.sort()
-            match_list_4_all.append(match_temp_1)
-            match_list_4_unique.add(tuple(match_temp_1))
-            
-            match_temp_1 = [match_temp[0], match_temp[1], match_temp[2]]
-            match_temp_1.sort()
-            match_list_3_all.append(match_temp_1)
-            match_list_3_unique.add(tuple(match_temp_1))
-            match_temp_1 = [match_temp[0], match_temp[1], match_temp[3]]
-            match_temp_1.sort()
-            match_list_3_all.append(match_temp_1)
-            match_list_3_unique.add(tuple(match_temp_1))
-            match_temp_1 = [match_temp[0], match_temp[2], match_temp[3]]
-            match_temp_1.sort()
-            match_list_3_all.append(match_temp_1)
-            match_list_3_unique.add(tuple(match_temp_1))
-            match_temp_1 = [match_temp[1], match_temp[2], match_temp[3]]
-            match_temp_1.sort()
-            match_list_3_all.append(match_temp_1)
-            match_list_3_unique.add(tuple(match_temp_1))
-
-    number_of_overlaps_3 = len(match_list_3_all)-len(match_list_3_unique)
-    number_of_overlaps_4 = len(match_list_4_all)-len(match_list_4_unique)
-
-    #overlap_score()
-    weighting = 0
-    weighting += number_of_overlaps_3*OVERLAP_3_WEIGHTING*3
-    weighting += number_of_overlaps_4*OVERLAP_4_WEIGHTING*4
+        weighting = 0
     return OVERLAP_WEIGHTING_OVERALL*weighting
 
 def get_overall_spacing_score_from_schedule(match_schedule, in_blocks=False):
@@ -214,7 +221,7 @@ def get_overall_spacing_score_from_schedule(match_schedule, in_blocks=False):
                 counter += 1
 
     #match_spacing_score()
-    match_spacing_target = (number_of_teams/4)-1
+    match_spacing_target = (number_of_teams/NUMBER_OF_TEAMS_PER_MATCH)-1
     weighting = 0
     for match_spacing in spacings_data:
         weighting += MATCH_SPACING_WEIGHTING_OVERALL * (abs(match_spacing_target-match_spacing)**2 + 4*math.exp((5.5-match_spacing)))
@@ -244,55 +251,64 @@ def get_overall_score_from_schedule(match_schedule, in_blocks=False):
 #Corner Stuff::
 
 def change_corner_order(match, adjust_num):
-    c0, c1, c2, c3 = match
-    if adjust_num == 0:
-        return [c0, c1, c2, c3]
-    elif adjust_num == 1:
-        return [c0, c1, c3, c2]
-    elif adjust_num == 2:
-        return [c0, c2, c1, c3]
-    elif adjust_num == 3:
-        return [c0, c2, c3, c1]
-    elif adjust_num == 4:
-        return [c0, c3, c1, c2]
-    elif adjust_num == 5:
-        return [c0, c3, c2, c1]
-    elif adjust_num == 6:
-        return [c1, c0, c2, c3]
-    elif adjust_num == 7:
-        return [c1, c0, c3, c2]
-    elif adjust_num == 8:
-        return [c1, c2, c0, c3]
-    elif adjust_num == 9:
-        return [c1, c2, c3, c0]
-    elif adjust_num == 10:
-        return [c1, c3, c0, c2]
-    elif adjust_num == 11:
-        return [c1, c3, c2, c0]
-    elif adjust_num == 12:
-        return [c2, c0, c1, c3]
-    elif adjust_num == 13:
-        return [c2, c0, c3, c1]
-    elif adjust_num == 14:
-        return [c2, c1, c0, c3]
-    elif adjust_num == 15:
-        return [c2, c1, c3, c0]
-    elif adjust_num == 16:
-        return [c2, c3, c0, c1]
-    elif adjust_num == 17:
-        return [c2, c3, c1, c0]
-    elif adjust_num == 18:
-        return [c3, c0, c1, c2]
-    elif adjust_num == 19:
-        return [c3, c0, c2, c1]
-    elif adjust_num == 20:
-        return [c3, c1, c0, c2]
-    elif adjust_num == 21:
-        return [c3, c1, c2, c0]
-    elif adjust_num == 22:
-        return [c3, c2, c0, c1]
-    elif adjust_num == 23:
-        return [c3, c2, c1, c0]
+    if NUMBER_OF_TEAMS_PER_MATCH == 4:
+        c0, c1, c2, c3 = match
+        if adjust_num == 0:
+            return [c0, c1, c2, c3]
+        elif adjust_num == 1:
+            return [c0, c1, c3, c2]
+        elif adjust_num == 2:
+            return [c0, c2, c1, c3]
+        elif adjust_num == 3:
+            return [c0, c2, c3, c1]
+        elif adjust_num == 4:
+            return [c0, c3, c1, c2]
+        elif adjust_num == 5:
+            return [c0, c3, c2, c1]
+        elif adjust_num == 6:
+            return [c1, c0, c2, c3]
+        elif adjust_num == 7:
+            return [c1, c0, c3, c2]
+        elif adjust_num == 8:
+            return [c1, c2, c0, c3]
+        elif adjust_num == 9:
+            return [c1, c2, c3, c0]
+        elif adjust_num == 10:
+            return [c1, c3, c0, c2]
+        elif adjust_num == 11:
+            return [c1, c3, c2, c0]
+        elif adjust_num == 12:
+            return [c2, c0, c1, c3]
+        elif adjust_num == 13:
+            return [c2, c0, c3, c1]
+        elif adjust_num == 14:
+            return [c2, c1, c0, c3]
+        elif adjust_num == 15:
+            return [c2, c1, c3, c0]
+        elif adjust_num == 16:
+            return [c2, c3, c0, c1]
+        elif adjust_num == 17:
+            return [c2, c3, c1, c0]
+        elif adjust_num == 18:
+            return [c3, c0, c1, c2]
+        elif adjust_num == 19:
+            return [c3, c0, c2, c1]
+        elif adjust_num == 20:
+            return [c3, c1, c0, c2]
+        elif adjust_num == 21:
+            return [c3, c1, c2, c0]
+        elif adjust_num == 22:
+            return [c3, c2, c0, c1]
+        elif adjust_num == 23:
+            return [c3, c2, c1, c0]
+        else:
+            return match
+    elif NUMBER_OF_TEAMS_PER_MATCH == 2:
+        c0, c1 = match
+        if adjust_num == 0:
+            return [c0, c1]
+        elif adjust_num == 1:
+            return [c1, c0]
     else:
         return match
 
@@ -303,7 +319,7 @@ def shuffle_corners_specific_block(match_schedule, block_num):
         test_schedule = copy.deepcopy(match_schedule)
         current_best_schedule = copy.deepcopy(test_schedule)
         current_best_score = get_overall_corner_score_from_schedule(test_schedule, True)
-        for p in range(1, 24):
+        for p in range(1, math.factorial(NUMBER_OF_TEAMS_PER_MATCH)):   # The range goes from 1 to n! as 0 is the current corner ordering (i.e. the current best score)
             test_schedule[block_num][n] = change_corner_order(match, p)
             test_score = get_overall_corner_score_from_schedule(test_schedule, True)
             if test_score < current_best_score:
@@ -323,7 +339,7 @@ def shuffle_corners_whole_schedule(match_schedule, in_blocks=False):
                 test_schedule = copy.deepcopy(match_schedule)
                 current_best_schedule = copy.deepcopy(test_schedule)
                 current_best_score = get_overall_corner_score_from_schedule(test_schedule, True)
-                for p in range(1, 24):
+                for p in range(1, math.factorial(NUMBER_OF_TEAMS_PER_MATCH)):   # The range goes from 1 to n! as 0 is the current corner ordering (i.e. the current best score)
                     test_schedule[m][n] = change_corner_order(match, p)
                     test_score = get_overall_corner_score_from_schedule(test_schedule, True)
                     if test_score < current_best_score:
@@ -339,7 +355,7 @@ def shuffle_corners_whole_schedule(match_schedule, in_blocks=False):
             test_schedule = copy.deepcopy(match_schedule)
             current_best_schedule = copy.deepcopy(test_schedule)
             current_best_score = get_overall_corner_score_from_schedule(test_schedule)
-            for p in range(1, 24):
+            for p in range(1, math.factorial(NUMBER_OF_TEAMS_PER_MATCH)):   # The range goes from 1 to n! as 0 is the current corner ordering (i.e. the current best score)
                 test_schedule[n] = change_corner_order(match, p)
                 test_score = get_overall_corner_score_from_schedule(test_schedule)
                 if test_score < current_best_score:
@@ -356,7 +372,7 @@ def shuffle_schedule_specific_block(match_schedule, block_num, optimisation_leve
     global time_taken_shuffling
     m = 0
     while m < len(match_schedule[block_num]):
-        for n in range(4):
+        for n in range(NUMBER_OF_TEAMS_PER_MATCH):
             specific_team_number = match_schedule[block_num][m][n]
 
             current_best_schedule = copy.deepcopy(match_schedule)
@@ -389,7 +405,7 @@ def shuffle_schedule_specific_block(match_schedule, block_num, optimisation_leve
                     count += 1
 
                 if if_test:
-                    for q in range(4):
+                    for q in range(NUMBER_OF_TEAMS_PER_MATCH):
                         if optimisation_level == 2:
                             index = m-2
                             total_count = 5
@@ -461,7 +477,7 @@ def shuffle_schedule_whole_schedule(match_schedule, optimisation_level=0, in_blo
         while b < len(match_schedule):
             m = 0
             while m < len(match_schedule[b]):
-                for n in range(4):
+                for n in range(NUMBER_OF_TEAMS_PER_MATCH):
                     specific_team_number = match_schedule[b][m][n]
 
                     current_best_schedule = copy.deepcopy(match_schedule)
@@ -496,7 +512,7 @@ def shuffle_schedule_whole_schedule(match_schedule, optimisation_level=0, in_blo
                                 count += 1
                             
                             if if_test:
-                                for q in range(4):
+                                for q in range(NUMBER_OF_TEAMS_PER_MATCH):
                                     if optimisation_level == 2:
                                         index = m-2
                                         total_count = 5
@@ -537,7 +553,7 @@ def shuffle_schedule_whole_schedule(match_schedule, optimisation_level=0, in_blo
     else:
         m = 0
         while m < len(match_schedule):
-            for n in range(4):
+            for n in range(NUMBER_OF_TEAMS_PER_MATCH):
                 specific_team_number = match_schedule[m][n]
 
                 current_best_schedule = copy.deepcopy(match_schedule)
@@ -570,7 +586,7 @@ def shuffle_schedule_whole_schedule(match_schedule, optimisation_level=0, in_blo
                         count += 1
                     
                     if if_test:
-                        for q in range(4):
+                        for q in range(NUMBER_OF_TEAMS_PER_MATCH):
                             if optimisation_level == 2:
                                 index = m-2
                                 total_count = 5
@@ -651,11 +667,12 @@ def optimise_schedule_from_file(file_location, optimisation_level=0):
 def generate_schedule(number_of_teams, number_of_appearances, optimisation_level=0, silent=False, match_schedule=[], teams_to_exclude=[]):
     global time_taken_spacing, time_taken_facings, time_taken_overlap, time_taken_shuffling
     time_taken_spacing, time_taken_facings, time_taken_overlap, time_taken_shuffling = 0, 0, 0, 0
-    if number_of_teams*number_of_appearances % 4 == 0:
-        print(f"Number of matches: {int(number_of_teams*number_of_appearances//4)}")
+    if number_of_teams*number_of_appearances % NUMBER_OF_TEAMS_PER_MATCH == 0:
         fake_teams_to_add = 0
+        print(f"Number of matches: {int(number_of_teams*number_of_appearances//NUMBER_OF_TEAMS_PER_MATCH)}")
     else:
-        fake_teams_to_add = 4 - number_of_teams*number_of_appearances % 4
+        fake_teams_to_add = NUMBER_OF_TEAMS_PER_MATCH - number_of_teams*number_of_appearances % NUMBER_OF_TEAMS_PER_MATCH
+        print(f"Number of matches: {int((number_of_teams*number_of_appearances+fake_teams_to_add)//NUMBER_OF_TEAMS_PER_MATCH)}")
     if fake_teams_to_add >= 3:
         fake_3_added = False
     else:
@@ -670,9 +687,9 @@ def generate_schedule(number_of_teams, number_of_appearances, optimisation_level
         fake_1_added = True
     expected_team_occurences = number_of_teams*number_of_appearances + fake_teams_to_add
     
-    if number_of_teams%4 == 0:
+    if number_of_teams%NUMBER_OF_TEAMS_PER_MATCH == 0:
         rounds_per_block = 1
-    elif number_of_teams%2 == 0:
+    elif number_of_teams%(NUMBER_OF_TEAMS_PER_MATCH/2) == 0:
         rounds_per_block = 2
     else:
         rounds_per_block = 4
@@ -689,8 +706,13 @@ def generate_schedule(number_of_teams, number_of_appearances, optimisation_level
         
         league_block = []
         n = 0
-        while n < len(match_list_unseparated)/4:
-            league_block.append([match_list_unseparated[4*n], match_list_unseparated[4*n+1], match_list_unseparated[4*n+2], match_list_unseparated[4*n+3]])
+        while n < len(match_list_unseparated)/NUMBER_OF_TEAMS_PER_MATCH:
+            match_to_append = []
+            q = 0
+            while q < NUMBER_OF_TEAMS_PER_MATCH:
+                match_to_append.append(match_list_unseparated[NUMBER_OF_TEAMS_PER_MATCH*n+q])
+                q += 1
+            league_block.append(match_to_append)
             n += 1
 
         match_schedule.append(league_block)
@@ -740,8 +762,13 @@ def generate_schedule(number_of_teams, number_of_appearances, optimisation_level
     
     league_block = []
     n = 0
-    while n < len(match_list_unseparated)/4:
-        league_block.append([match_list_unseparated[4*n], match_list_unseparated[4*n+1], match_list_unseparated[4*n+2], match_list_unseparated[4*n+3]])
+    while n < len(match_list_unseparated)/NUMBER_OF_TEAMS_PER_MATCH:
+        match_to_append = []
+        q = 0
+        while q < NUMBER_OF_TEAMS_PER_MATCH:
+            match_to_append.append(match_list_unseparated[NUMBER_OF_TEAMS_PER_MATCH*n+q])
+            q += 1
+        league_block.append(match_to_append)
         n += 1
 
     # print(f"Last league block: {league_block}")

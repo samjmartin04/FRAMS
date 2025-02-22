@@ -139,22 +139,20 @@ def import_schedule(file_location, league_block_size=0):
 
 def export_schedule_to_txt(match_schedule, file_location, in_blocks=False):
     if in_blocks:
-        export_text = ""
-        for league_block in match_schedule:
-            for match in league_block:
-                export_text += f"{match[0]}|{match[1]}|{match[2]}|{match[3]}\n"
-        export_text = export_text[:-1]
-        f = open(file_location, "w")
-        f.write(export_text)
-        f.close()
-    else:
+        match_schedule = remove_league_blocks_from_schedule(match_schedule)
+    
+    if NUMBER_OF_TEAMS_PER_MATCH == 4:
         export_text = ""
         for match in match_schedule:
             export_text += f"{match[0]}|{match[1]}|{match[2]}|{match[3]}\n"
-        export_text = export_text[:-1]
-        f = open(file_location, "w")
-        f.write(export_text)
-        f.close()
+    elif NUMBER_OF_TEAMS_PER_MATCH == 2:
+        export_text = ""
+        for match in match_schedule:
+            export_text += f"{match[0]}|{match[1]}\n"
+    export_text = export_text[:-1]
+    f = open(file_location, "w")
+    f.write(export_text)
+    f.close()
 
 
 def get_list_of_team_numbers(number_of_teams):
