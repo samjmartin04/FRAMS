@@ -142,10 +142,10 @@ def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
     av_spacing_summary_list.append(av_value_from_dict(av_spacings_list))
     av_spacing_summary_list.append(max_value_from_dict(av_spacings_list))
 
-    top_line_text = "                     min    av     max"
-    min_spacing_output_text = f"Minimum Spacings:   {min_spacing_summary_list[0]:4.1f}   {min_spacing_summary_list[1]:4.1f}   {min_spacing_summary_list[2]:4.1f}"
-    av_spacing_output_text =  f"Average Spacings:   {av_spacing_summary_list[0]:4.1f}   {av_spacing_summary_list[1]:4.1f}   {av_spacing_summary_list[2]:4.1f}"
-    max_spacing_output_text = f"Maximum Spacings:   {max_spacing_summary_list[0]:4.1f}   {max_spacing_summary_list[1]:4.1f}   {max_spacing_summary_list[2]:4.1f}"
+    top_line_text = "                       min    av     max"
+    min_spacing_output_text = f"  Minimum Spacings:   {min_spacing_summary_list[0]:4.1f}   {min_spacing_summary_list[1]:4.1f}   {min_spacing_summary_list[2]:4.1f}"
+    av_spacing_output_text =  f"  Average Spacings:   {av_spacing_summary_list[0]:4.1f}   {av_spacing_summary_list[1]:4.1f}   {av_spacing_summary_list[2]:4.1f}"
+    max_spacing_output_text = f"  Maximum Spacings:   {max_spacing_summary_list[0]:4.1f}   {max_spacing_summary_list[1]:4.1f}   {max_spacing_summary_list[2]:4.1f}"
 
     output_text += f"\n{top_line_text}\n{min_spacing_output_text}\n{av_spacing_output_text}\n{max_spacing_output_text}\n"
 
@@ -178,7 +178,7 @@ def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
     n = 0
     while n < len(min_spacings_count_list):
         if min_spacings_count_list[n] > 0:
-            text_to_add = f"Min spacing of {n:>2}: {min_spacings_count_list[n]:>3} teams"
+            text_to_add = f"  Min spacing of {n:>2}: {min_spacings_count_list[n]:>3} teams"
             if n == strong_alert_level_low:
                 colour_for_text = "red"
                 text = f"{min_spacings_count_list[n]:>3} teams have a minimum spacing of {strong_alert_level_low}."
@@ -217,7 +217,7 @@ def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
     n = 0
     while n < len(max_spacings_count_list):
         if max_spacings_count_list[n] > 0:
-            text_to_add = f"Max spacing of {n:>2}: {max_spacings_count_list[n]:>3} teams"
+            text_to_add = f"  Max spacing of {n:>2}: {max_spacings_count_list[n]:>3} teams"
             if n > medium_alert_level_high:
                 colour_for_text = "orange"
                 medium_alert_level_high_count += max_spacings_count_list[n]
@@ -554,7 +554,7 @@ def facings_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
     number_of_teams = get_number_of_teams_from_schedule(match_schedule)
     number_of_appearances = get_appearances_from_schedule(match_schedule)
     output_text = "\n## Facings\n"
-    output_text += "\n#### This looks at whether a team has faced another team and how often they have done so.\n"
+    output_text += "\n#### This looks at which how many teams a team faces and how many they do not face.\n"
     facings_data_all = {}
     list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule)
     list_of_team_numbers_for_repeats = get_list_of_team_numbers_from_schedule(match_schedule)
@@ -594,7 +594,7 @@ def facings_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
                 total_teams_list.append(m)
         
         if total_teams > 0:
-            text_to_add = f" faces {n:>3} {f'({number_of_teams-1-n})':>5}: {total_teams:>3} teams"
+            text_to_add = f"  faces {n:>3} {f'({number_of_teams-1-n})':>5}: {total_teams:>3} teams"
             if n == best_faces and total_teams == number_of_teams:
                 text_to_add = colour_text(text_to_add, "green")
                 checks_text_to_add = f"{total_teams:>3} teams face {n:>3} {f'({number_of_teams-1-n})':>5}."
@@ -648,6 +648,8 @@ def facings_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
         output_text += f"\n{weak_alert_level_text}"
         output_text += "\n"
     
+    output_text += "\n#### This looks at how many times a team has faced other teams.\n"
+
     output_text += "\nRepeats:"
 
     target_repeats = number_of_appearances*(number_of_teams_per_match-1)/number_of_teams
@@ -704,22 +706,21 @@ def facings_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
         text = f"{strong_alert_level_repeats_count:>3} teams play at least one team more than {math.floor(strong_alert_level_repeats)} times."
         strong_alert_level_text = f"{colour_text(text, 'red')} Playing the same team(s) a lot of times is repetitive and can be unfair."
         summary_of_checks[0].append(["repeats", strong_alert_level_text])
-        output_text += f"\n{strong_alert_level_text}"
-        output_text += "\n"
+        output_text += f"\n{strong_alert_level_text}\n"
     
     if medium_alert_level_repeats_count > 0:
         text = f"{medium_alert_level_repeats_count:>3} teams play at least one team more than {math.floor(medium_alert_level_repeats)} times."
         medium_alert_level_text = f"{colour_text(text, 'orange')} Playing the same team(s) many times times is repetitive and can be unfair."
         summary_of_checks[1].append(["repeats", medium_alert_level_text])
-        output_text += f"\n{medium_alert_level_text}"
-        output_text += "\n"
+        output_text += f"\n{medium_alert_level_text}\n"
     
     if weak_alert_level_repeats_count > 0:
         text = f"{weak_alert_level_repeats_count:>3} teams play at least one team more than {math.floor(weak_alert_level_repeats)} times."
         weak_alert_level_text = f"{colour_text(text, 'yellow')} Playing the same team(s) a few times is repetitive and can be unfair."
         summary_of_checks[2].append(["repeats", weak_alert_level_text])
-        output_text += f"\n{weak_alert_level_text}"
-        output_text += "\n"
+        output_text += f"\n{weak_alert_level_text}\n"
+    
+    output_text += "\n"
 
     if detailed:
         output_text += "\nFacings more detailed:\n"
@@ -829,10 +830,11 @@ def appearances_check(match_schedule, summary_of_checks, exclude_teams_list, det
             n -= 1
     
     if red_appearances:
-        text_to_add = "Not all teams have the same number of appearances. All teams should have the same number of matches."
-        summary_of_checks[0].append(["appearances", f"{colour_text(text_to_add, 'red')} Note that unequal appearances may have resulted in errors elsewhere in the checks."])
+        text_to_add = "Not all teams have the same number of appearances."
+        summary_of_checks[0].append(["appearances", f"{colour_text(text_to_add, 'red')} All teams should have the same number of matches. Note that unequal appearances may have resulted in errors elsewhere in the checks."])
+        output_text += f"\n{colour_text(text_to_add, 'red')} All teams should have the same number of matches. Note that unequal appearances may have resulted in errors elsewhere in the checks."
     
-    output_text += "\n"
+    output_text += "\n\n"
     return output_text, summary_of_checks
 
 def get_number_of_non_four_robot_matches(match_schedule):
@@ -886,21 +888,21 @@ def non_four_robot_match_check(match_schedule, summary_of_checks, exclude_teams_
             add_s = ""
         else:
             add_s = "es"
-        text_to_add = f"\n Number of 1 robot matches: {number_of_one_robot_matches:>2} match{add_s}"
+        text_to_add = f"\n  Number of 1 robot matches: {number_of_one_robot_matches:>2} match{add_s}"
         checks_text_to_add = f"The number of 1 robot matches is {number_of_one_robot_matches} match{add_s}."
         
         if number_of_one_robot_matches == 0:
             output_text += colour_text(text_to_add, "green")
-            alert_text_one_robot = ""
+            alert_text_one_robot = "\n"
             summary_of_checks[3].append(["1 robot matches", f"{colour_text(checks_text_to_add, 'green')} This is the ideal number of 1 robot matches."])
         else:
             output_text += colour_text(text_to_add, "red")
-            alert_text_one_robot = "\nThe ideal number of 1 robot matches is 0 matches."
+            alert_text_one_robot = "\nThe ideal number of 1 robot matches is 0 matches.\n"
             summary_of_checks[0].append(["1 robot matches", f"{colour_text(checks_text_to_add, 'red')} The ideal number of 1 robot matches is 0 matches."])
         
-        output_text += f"\n{alert_text_one_robot}"
+        output_text += f"\n{alert_text_one_robot}\n"
     else:
-        text_to_add = f"\n Number of 3 robot matches: {number_of_three_robot_matches:>2} match{add_s}"
+        text_to_add = f"\n  Number of 3 robot matches: {number_of_three_robot_matches:>2} match{add_s}"
 
         if number_of_three_robot_matches == fake_teams_to_add:
             output_text += colour_text(text_to_add, "green")
@@ -914,14 +916,14 @@ def non_four_robot_match_check(match_schedule, summary_of_checks, exclude_teams_
                 add_s = ""
             else:
                 add_s = "es"
-            alert_text_three_robot = f"\nThe ideal number of 3 robot matches is {fake_teams_to_add} match{add_s}."
+            alert_text_three_robot = f"\nThe ideal number of 3 robot matches is {fake_teams_to_add} match{add_s}.\n"
             summary_of_checks[1].append(["3 robot matches", f"{colour_text(checks_text_to_add, 'orange')} The ideal number of 3 robot matches for this number of teams and appearances is {fake_teams_to_add} match{add_s}"])
         
         if number_of_two_robot_matches == 1:
             add_s = ""
         else:
             add_s = "es"
-        text_to_add = f"\n Number of 2 robot matches: {number_of_two_robot_matches:>2} match{add_s}"
+        text_to_add = f"\n  Number of 2 robot matches: {number_of_two_robot_matches:>2} match{add_s}"
         checks_text_to_add = f"The number of 2 robot matches is {number_of_two_robot_matches} match{add_s}."
 
         if number_of_two_robot_matches == 0:
@@ -930,14 +932,14 @@ def non_four_robot_match_check(match_schedule, summary_of_checks, exclude_teams_
             summary_of_checks[3].append(["2 robot matches", f"{colour_text(checks_text_to_add, 'green')} This is the ideal number of 2 robot matches."])
         else:
             output_text += colour_text(text_to_add, "red")
-            alert_text_two_robot = "\nThe ideal number of 2 robot matches is 0 matches."
+            alert_text_two_robot = "\nThe ideal number of 2 robot matches is 0 matches.\n"
             summary_of_checks[0].append(["2 robot matches", f"{colour_text(checks_text_to_add, 'red')} The ideal number of 2 robot matches is 0 matches."])
             
         if number_of_one_robot_matches == 1:
             add_s = ""
         else:
             add_s = "es"
-        text_to_add = f"\n Number of 1 robot matches: {number_of_one_robot_matches:>2} match{add_s}"
+        text_to_add = f"\n  Number of 1 robot matches: {number_of_one_robot_matches:>2} match{add_s}"
         checks_text_to_add = f"The number of 1 robot matches is {number_of_one_robot_matches} match{add_s}."
         
         if number_of_one_robot_matches == 0:
@@ -946,15 +948,12 @@ def non_four_robot_match_check(match_schedule, summary_of_checks, exclude_teams_
             summary_of_checks[3].append(["1 robot matches", f"{colour_text(checks_text_to_add, 'green')} This is the ideal number of 1 robot matches."])
         else:
             output_text += colour_text(text_to_add, "red")
-            alert_text_one_robot = "\nThe ideal number of 1 robot matches is 0 matches."
+            alert_text_one_robot = "\nThe ideal number of 1 robot matches is 0 matches.\n"
             summary_of_checks[0].append(["1 robot matches", f"{colour_text(checks_text_to_add, 'red')} The ideal number of 1 robot matches is 0 matches."])
         
         output_text += f"\n{alert_text_three_robot}{alert_text_two_robot}{alert_text_one_robot}"
 
-        if alert_text_three_robot == "" and alert_text_two_robot == "" and alert_text_one_robot == "":
-            output_text += "\n"
-        else:
-            output_text += "\n\n"
+        output_text += "\n"
     
     if detailed:
         output_text += "\nNumber of times each team is present in 3 robot matches:"
@@ -1190,11 +1189,11 @@ def teams_in_match_multiple_times_check(match_schedule, summary_of_checks, exclu
     output_text += "\n#### Checks to make sure a single team number does not appear in a match multiple times.\n"
     list_data = get_teams_in_match_multiple_times_data(match_schedule)
     if len(list_data) == 0:
-        output_text += colour_text(f"\nNumber of matches with multiple team numbers: {len(list_data)} matches", "green")
+        output_text += colour_text(f"\n  Number of matches with multiple team numbers: {len(list_data)} matches", "green")
         checks_text_to_add = f"The number of matches with multiple of the same number in them is {len(list_data)} matches."
         summary_of_checks[3].append(["teams in match multiple times", f"{colour_text(checks_text_to_add, 'green')}"])
     else:
-        output_text += colour_text(f"\nNumber of matches with multiple team numbers: {len(list_data)} matches", "red")
+        output_text += colour_text(f"\n  Number of matches with multiple team numbers: {len(list_data)} matches", "red")
         if not FIRST_MATCH_IS_MATCH_ZERO:
             n = 0
             while n < len(list_data):
@@ -1313,24 +1312,24 @@ def corners_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
     
     if strong_alert_std_count > 0:
         text = f"{strong_alert_std_count:>3} teams have a zone allocation standard deviation larger than {strong_alert_level:.1f}."
-        strong_alert_level_text = f"{colour_text(text, 'red')} This zone allocation is very unequally distributed."
+        strong_alert_level_text = f"{colour_text(text, 'red')} This zone allocation is very unequally distributed.\n"
         summary_of_checks[0].append(["zone allocation", strong_alert_level_text])
         output_text += f"\n{strong_alert_level_text}"
     
     if medium_alert_std_count > 0:
         text = f"{medium_alert_std_count+strong_alert_std_count:>3} teams have a zone allocation standard deviation larger than {medium_alert_level:.1f}."
-        medium_alert_level_text = f"{colour_text(text, 'orange')} This zone allocation is quite unequally distributed."
+        medium_alert_level_text = f"{colour_text(text, 'orange')} This zone allocation is quite unequally distributed.\n"
         summary_of_checks[1].append(["zone allocation", medium_alert_level_text])
         output_text += f"\n{medium_alert_level_text}"
     
     if weak_alert_std_count > 0:
         text = f"{weak_alert_std_count+medium_alert_std_count+strong_alert_std_count:>3} teams have a zone allocation standard deviation larger than {weak_alert_level:.1f}."
-        weak_alert_level_text = f"{colour_text(text, 'yellow')} This zone allocation is a bit unequally distributed."
+        weak_alert_level_text = f"{colour_text(text, 'yellow')} This zone allocation is a bit unequally distributed.\n"
         summary_of_checks[2].append(["zone allocation", weak_alert_level_text])
         output_text += f"\n{weak_alert_level_text}"
     
-    if strong_alert_std_count > 0 or medium_alert_std_count > 0 or weak_alert_std_count > 0:
-        output_text += "\n"
+    # if strong_alert_std_count > 0 or medium_alert_std_count > 0 or weak_alert_std_count > 0:
+    #     output_text += "\n"
     
     if detailed:
         output_text += "\nDetailed zones data:"
@@ -1520,15 +1519,15 @@ location = ""
 Various different schedules with different concerns as described.
 These are useful for checking all the different check features are working as expected.
 """
-# location = "Test Schedules/test_23_8_awful2.txt"                       #3,2,1 robot match concerns; unequal appearances; team number in same match twice; no perfect sections.
-# location = "Test Schedules/schedule_t12-a4.txt"                        #All concerns for minimum spacing.
-location = "Test Schedules/SR2024-final-schedule.txt"                  #Strong and weak concerns for both minimum and maximum spacing.
-# location = "Test Schedules/SR2024-final-schedule_optimised.txt"        #Perfect facings.
-# location = "Test Schedules/SR2023-yabms-36.txt"                        #Perfect corner standard deviation.
-# location = "Test Schedules/schedule_t24-a12_2.txt"                     #Terrible corner standard deviation.
-# location = "Test Schedules/schedule_overlaps_bad.txt"                  #Couple of partial overlaps and 1 full overlap
-# location = "Test Schedules/schedule_overlaps_awful.txt"                #Lots and lots of partial and full overlaps
-# location = "Test Schedules/schedule_t27-a12_3.txt"                     #Completely perfect facings and repeats (each team faces 36 opponents across their 12 appearances - every single team plays 16 teams once and 10 teams twice)
+# location = "Test Schedules/test_23_8_awful2.txt"                       # 3,2,1 robot match concerns; unequal appearances; team number in same match twice; no perfect sections.
+# location = "Test Schedules/schedule_t12-a4.txt"                        # All concerns for minimum spacing.
+location = "Test Schedules/SR2024-final-schedule.txt"                  # Strong and weak concerns for both minimum and maximum spacing.
+# location = "Test Schedules/SR2024-final-schedule_optimised.txt"        # Perfect facings.
+# location = "Test Schedules/SR2023-yabms-36.txt"                        # Perfect corner standard deviation.
+# location = "Test Schedules/schedule_t24-a12_2.txt"                     # Terrible corner standard deviation.
+# location = "Test Schedules/schedule_overlaps_bad.txt"                  # Couple of partial overlaps and 1 full overlap
+# location = "Test Schedules/schedule_overlaps_awful.txt"                # Lots and lots of partial and full overlaps
+# location = "Test Schedules/schedule_t27-a12_3.txt"                     # Completely perfect facings and repeats (each team faces 36 opponents across their 12 appearances - every single team plays 16 teams once and 10 teams twice)
 
 
 if __name__ == '__main__':
