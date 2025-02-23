@@ -691,7 +691,7 @@ def facings_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
             if add_team_numbers:
                 if number_of_teams_at_q == number_of_teams-len(exclude_teams_list):
                     team_list_text = " (All teams)"
-                elif number_of_teams_at_q > number_of_teams-len(exclude_teams_list)-5:
+                elif number_of_teams_at_q > number_of_teams-len(exclude_teams_list)-ALL_TEAMS_EXCEPT_THRESHOLD:
                     opposite_list = get_team_numbers_not_in_list(list_of_team_numbers_for_repeats, list_of_teams_at_q)
                     team_list_text = f" (All except: {tidy_list_of_team_numbers(opposite_list)[2:]}"
                 else:
