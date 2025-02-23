@@ -202,7 +202,7 @@ def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
                 add_team_numbers = False
             
             if add_team_numbers:
-                team_list_text = get_team_list_text_when_number_matches_dict(min_spacings_list, n)
+                team_list_text = get_team_list_when_number_matches_dict(min_spacings_list, n)
             else:
                 team_list_text = ""
             min_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}{team_list_text}\n"
@@ -231,7 +231,7 @@ def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
                 add_team_numbers = False
 
             if add_team_numbers:
-                team_list_text = get_team_list_text_when_number_matches_dict(max_spacings_list, n)
+                team_list_text = get_team_list_when_number_matches_dict(max_spacings_list, n)
             else:
                 team_list_text = ""
             max_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}{team_list_text}\n"
@@ -689,13 +689,7 @@ def facings_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
             
             text_to_add = colour_text(f"  faces 1+ teams {q:>2} times: {number_of_teams_at_q:>3} teams", colour)
             if add_team_numbers:
-                if number_of_teams_at_q == number_of_teams-len(exclude_teams_list):
-                    team_list_text = " (All teams)"
-                elif number_of_teams_at_q > number_of_teams-len(exclude_teams_list)-ALL_TEAMS_EXCEPT_THRESHOLD:
-                    opposite_list = get_team_numbers_not_in_list(list_of_team_numbers_for_repeats, list_of_teams_at_q)
-                    team_list_text = f" (All except: {tidy_list_of_team_numbers(opposite_list)[2:]}"
-                else:
-                    team_list_text = tidy_list_of_team_numbers(list_of_teams_at_q)
+                team_list_text = tidy_list_of_team_numbers_text(list_of_teams_at_q, number_of_teams, exclude_teams_list)
                 output_text += f"\n{text_to_add}{team_list_text}"
 
                 number_of_teams_faced_at_q = {}
@@ -717,13 +711,7 @@ def facings_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
                     b, list_of_teams_facing_b_teams = display_list[c]
                     if b > 0:
                         text_to_add = colour_text(f"    faces {b:>3} teams {q:>2}x: {len(list_of_teams_facing_b_teams):>3} teams", colour)
-                        if len(list_of_teams_facing_b_teams) == number_of_teams-len(exclude_teams_list):
-                            team_list_text = " (All teams)"
-                        elif len(list_of_teams_facing_b_teams) > number_of_teams-len(exclude_teams_list)-ALL_TEAMS_EXCEPT_THRESHOLD:
-                            opposite_list = get_team_numbers_not_in_list(list_of_team_numbers_for_repeats, list_of_teams_facing_b_teams)
-                            team_list_text = f" (All except: {tidy_list_of_team_numbers(opposite_list)[2:]}"
-                        else:
-                            team_list_text = tidy_list_of_team_numbers(list_of_teams_facing_b_teams)
+                        team_list_text = tidy_list_of_team_numbers_text(list_of_teams_facing_b_teams, number_of_teams, exclude_teams_list)
                         output_text += f"\n{text_to_add}{team_list_text}"
                     c -= 1
             else:
@@ -852,7 +840,8 @@ def appearances_check(match_schedule, summary_of_checks, exclude_teams_list, det
                 team_list_text = ""
             else:
                 colour = "red"
-                team_list_text = get_team_list_text_when_number_matches_dict(appearances_list, item[0])
+                team_list = get_team_list_when_number_matches_dict(appearances_list, item[0])
+                tidy_list_of_team_numbers_text(team_list, number_of_teams, exclude_teams_list)
             output_text += colour_text(f"{text_to_add}", colour)
             output_text += f"{team_list_text}\n"
             red_appearances = True

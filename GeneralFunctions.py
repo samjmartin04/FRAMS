@@ -302,18 +302,15 @@ def get_team_list_text_when_number_matches(info_array, number_to_match_with):
     team_list_text += ")"
     return team_list_text
 
-def get_team_list_text_when_number_matches_dict(info_dict, number_to_match_with):
+def get_team_list_when_number_matches_dict(info_dict, number_to_match_with):
     """
-    Takes an array with info in it (ordered such that index 0 is team 1) and returns a list with every team number that matches the number_to_match_with value
+    Takes dict with info in it and returns an array with every team number that matches the number_to_match_with value
     """
-    team_list_text = " ("
+    team_list = []
     for m, spacing in info_dict.items():
         if spacing == number_to_match_with:
-            team_list_text += f"{m}, "
-    
-    team_list_text = team_list_text[:-2]
-    team_list_text += ")"
-    return team_list_text
+            team_list.append(m)
+    return team_list
 
 def tidy_list_of_team_numbers(info_array):
     """
@@ -333,6 +330,19 @@ def get_team_numbers_not_in_list(list_of_team_numbers, list_to_exclude):
         if not team_number in list_to_exclude:
             output_array.append(team_number)
     return output_array
+
+def tidy_list_of_team_numbers_text(team_numbers_to_list, number_of_teams=0, exclude_teams_list=[]):
+    if number_of_teams == 0:
+        return tidy_list_of_team_numbers(team_numbers_to_list)
+    else:
+        if len(team_numbers_to_list) == number_of_teams-len(exclude_teams_list):
+            team_list_text = " (All teams)"
+        elif len(team_numbers_to_list) > number_of_teams-len(exclude_teams_list)-ALL_TEAMS_EXCEPT_THRESHOLD:
+            opposite_list = get_team_numbers_not_in_list(get_list_of_team_numbers(number_of_teams), team_numbers_to_list)
+            team_list_text = f" (All except: {tidy_list_of_team_numbers(opposite_list)[2:]}"
+        else:
+            team_list_text = tidy_list_of_team_numbers(team_numbers_to_list)
+        return team_list_text
 
 def number_array_from_list(list):
     try:

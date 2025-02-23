@@ -10,4 +10,4 @@ NUMBER_OF_ARENAS = 1
 INCREMENT_SPACING_CHECK = False      # If True, 1 is added to all the spacing results to match these checks: 
 COLOURED_TEXT = True
 FIRST_MATCH_IS_MATCH_ZERO = False    # If True, the first match is referred to as match 0; otherwise the first match is match 1.
-ALL_TEAMS_EXCEPT_THRESHOLD = 6       # The point at which the checks go from listing team numbers to say "All except: "
+ALL_TEAMS_EXCEPT_THRESHOLD = 9       # The point at which the checks go from listing team numbers to say "All except: "
