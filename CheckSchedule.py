@@ -687,7 +687,7 @@ def facings_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
                 colour = None
                 add_team_numbers = False
             
-            text_to_add = colour_text(f" {number_of_teams_at_q:>3} teams face at least 1 team {q:>2} times", colour)
+            text_to_add = colour_text(f"  faces 1+ teams {q:>2} times: {number_of_teams_at_q:>3} teams", colour)
             if add_team_numbers:
                 if number_of_teams_at_q == number_of_teams-len(exclude_teams_list):
                     team_list_text = " (All teams)"
