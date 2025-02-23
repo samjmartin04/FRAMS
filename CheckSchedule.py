@@ -202,7 +202,8 @@ def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
                 add_team_numbers = False
             
             if add_team_numbers:
-                team_list_text = get_team_list_when_number_matches_dict(min_spacings_list, n)
+                team_list = get_team_list_when_number_matches_dict(min_spacings_list, n)
+                team_list_text = tidy_list_of_team_numbers_text(team_list, number_of_teams, exclude_teams_list)
             else:
                 team_list_text = ""
             min_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}{team_list_text}\n"
@@ -231,7 +232,8 @@ def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
                 add_team_numbers = False
 
             if add_team_numbers:
-                team_list_text = get_team_list_when_number_matches_dict(max_spacings_list, n)
+                team_list = get_team_list_when_number_matches_dict(max_spacings_list, n)
+                team_list_text = tidy_list_of_team_numbers_text(team_list, number_of_teams, exclude_teams_list)
             else:
                 team_list_text = ""
             max_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}{team_list_text}\n"
@@ -1124,7 +1126,7 @@ def overlap_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
         colour = "yellow"
     
     # output_text += colour_text(f"\n  Number of partially overlapped matches: {len(match_lists_3)} match{add_s}.", colour)
-    text_to_add = colour_text(f"Number of partially overlapped matches: {total_match_lists_3} match{add_s}.", colour)
+    text_to_add = colour_text(f"Number of partially overlapped matches: {total_match_lists_3} match{add_s}", colour)
     output_text += f"\n  {text_to_add}"
     if total_match_lists_3 == 0:
         summary_of_checks[3].append(["partially overlapped matches", f"{text_to_add}"])
@@ -1146,7 +1148,7 @@ def overlap_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
         colour = "orange"
 
     # output_text += colour_text(f"\n  Number of identical matches: {len(match_lists_4)} match{add_s}.", colour)
-    text_to_add = colour_text(f"Number of identical matches: {total_match_lists_4} match{add_s}.", colour)
+    text_to_add = colour_text(f"Number of identical matches: {total_match_lists_4} match{add_s}", colour)
     output_text += f"\n  {text_to_add}"
     if total_match_lists_4 == 0:
         summary_of_checks[3].append(["identical matches", f"{text_to_add}"])
