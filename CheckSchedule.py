@@ -84,6 +84,7 @@ def av_value_from_dict(dict):
 
 def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detailed=False):
     number_of_teams = get_number_of_teams_from_schedule(match_schedule)-len(exclude_teams_list)
+    number_of_appearances = get_appearances_from_schedule(match_schedule)
     output_text = "\n## Spacings\n"
     output_text += "\n#### This looks at the spacing between matches for each team."
     if INCREMENT_SPACING_CHECK:
@@ -204,9 +205,30 @@ def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
             if add_team_numbers:
                 team_list = get_team_list_when_number_matches_dict(min_spacings_list, n)
                 team_list_text = tidy_list_of_team_numbers_text(team_list, number_of_teams, exclude_teams_list)
+                min_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}{team_list_text}\n"
+                
+                teams_at_each_occurence_for_spacing = {}
+                for b in range(number_of_appearances):
+                    teams_at_each_occurence_for_spacing[b] = []
+
+                for b in list_of_team_numbers:
+                    teams_at_each_occurence_for_spacing[spacings_data_all[b].count(n)].append(b)
+
+                display_list = []
+                for b, list_of_teams_with_b_occurences in teams_at_each_occurence_for_spacing.items():
+                    if len(list_of_teams_with_b_occurences) > 0:
+                        display_list.append([b, list_of_teams_with_b_occurences])
+                
+                c = len(display_list)-1
+                while c >= 0:
+                    b, list_of_teams_with_b_occurences = display_list[c]
+                    if b > 0:
+                        text_to_add = colour_text(f"    spacing of {n:>2} occurs {b:>2} times: {len(list_of_teams_with_b_occurences):>3} teams", colour_for_text)
+                        team_list_text = tidy_list_of_team_numbers_text(list_of_teams_with_b_occurences, number_of_teams, exclude_teams_list)
+                        min_spacings_count_text += f"{text_to_add}{team_list_text}\n"
+                    c -= 1
             else:
-                team_list_text = ""
-            min_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}{team_list_text}\n"
+                min_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}\n"
         n += 1
     
     min_spacings_count_text = min_spacings_count_text[:-1]
@@ -234,9 +256,30 @@ def spacing_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
             if add_team_numbers:
                 team_list = get_team_list_when_number_matches_dict(max_spacings_list, n)
                 team_list_text = tidy_list_of_team_numbers_text(team_list, number_of_teams, exclude_teams_list)
+                max_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}{team_list_text}\n"
+                
+                teams_at_each_occurence_for_spacing = {}
+                for b in range(number_of_appearances):
+                    teams_at_each_occurence_for_spacing[b] = []
+
+                for b in list_of_team_numbers:
+                    teams_at_each_occurence_for_spacing[spacings_data_all[b].count(n)].append(b)
+
+                display_list = []
+                for b, list_of_teams_with_b_occurences in teams_at_each_occurence_for_spacing.items():
+                    if len(list_of_teams_with_b_occurences) > 0:
+                        display_list.append([b, list_of_teams_with_b_occurences])
+                
+                c = len(display_list)-1
+                while c >= 0:
+                    b, list_of_teams_with_b_occurences = display_list[c]
+                    if b > 0:
+                        text_to_add = colour_text(f"    spacing of {n:>2} occurs {b:>2} times: {len(list_of_teams_with_b_occurences):>3} teams", colour_for_text)
+                        team_list_text = tidy_list_of_team_numbers_text(list_of_teams_with_b_occurences, number_of_teams, exclude_teams_list)
+                        max_spacings_count_text += f"{text_to_add}{team_list_text}\n"
+                    c -= 1
             else:
-                team_list_text = ""
-            max_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}{team_list_text}\n"
+                max_spacings_count_text += f"{colour_text(text_to_add, colour_for_text)}\n"
         n += 1
 
     max_spacings_count_text = max_spacings_count_text[:-1]
