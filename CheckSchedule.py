@@ -696,9 +696,38 @@ def facings_check(match_schedule, summary_of_checks, exclude_teams_list, detaile
                     team_list_text = f" (All except: {tidy_list_of_team_numbers(opposite_list)[2:]}"
                 else:
                     team_list_text = tidy_list_of_team_numbers(list_of_teams_at_q)
+                output_text += f"\n{text_to_add}{team_list_text}"
+
+                number_of_teams_faced_at_q = {}
+                number_of_teams_faced_at_q[0] = []
+                for b in list_of_team_numbers:
+                    number_of_teams_faced_at_q[b] = []
+
+                for team_number in list_of_team_numbers:
+                    if not team_number in exclude_teams_list:
+                        number_of_teams_faced_at_q[facings_data_all[team_number][q]].append(team_number)
+
+                display_list = []
+                for b, list_of_teams_facing_b_teams in number_of_teams_faced_at_q.items():
+                    if len(list_of_teams_facing_b_teams) > 0:
+                        display_list.append([b, list_of_teams_facing_b_teams])
+                
+                c = len(display_list)-1
+                while c >= 0:
+                    b, list_of_teams_facing_b_teams = display_list[c]
+                    if b > 0:
+                        text_to_add = colour_text(f"    faces {b:>3} teams {q:>2}x: {len(list_of_teams_facing_b_teams):>3} teams", colour)
+                        if len(list_of_teams_facing_b_teams) == number_of_teams-len(exclude_teams_list):
+                            team_list_text = " (All teams)"
+                        elif len(list_of_teams_facing_b_teams) > number_of_teams-len(exclude_teams_list)-ALL_TEAMS_EXCEPT_THRESHOLD:
+                            opposite_list = get_team_numbers_not_in_list(list_of_team_numbers_for_repeats, list_of_teams_facing_b_teams)
+                            team_list_text = f" (All except: {tidy_list_of_team_numbers(opposite_list)[2:]}"
+                        else:
+                            team_list_text = tidy_list_of_team_numbers(list_of_teams_facing_b_teams)
+                        output_text += f"\n{text_to_add}{team_list_text}"
+                    c -= 1
             else:
-                team_list_text = ""
-            output_text += f"\n{text_to_add}{team_list_text}"
+                output_text += f"\n{text_to_add}"
         
     output_text += "\n"
 
