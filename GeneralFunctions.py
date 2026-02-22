@@ -2,6 +2,7 @@ import csv
 import time
 import os
 import math
+import random
 
 from GlobalConstants import *
 
@@ -391,3 +392,64 @@ def number_array_from_list(list):
     except Exception as e:
         print(f"\nERROR PROCESSING LIST ENTERED: {e}")
         return []
+
+def randomise_numbers_in_schedule(match_schedule, in_blocks=False):
+    list_of_team_numbers = get_list_of_team_numbers_from_schedule(match_schedule, in_blocks)
+    pairs_list = []
+    for n in range(len(list_of_team_numbers)//2):
+        num1 = random.choice(list_of_team_numbers)
+        pos = list_of_team_numbers.index(num1)
+        list_of_team_numbers.pop(pos)
+        num2 = random.choice(list_of_team_numbers)
+        pos = list_of_team_numbers.index(num2)
+        list_of_team_numbers.pop(pos)
+        pairs_list.append([num1, num2])
+
+    for number_pair in pairs_list:
+        if in_blocks:
+            m = 0
+            while m < len(match_schedule):
+                n = 0
+                while n < len(match_schedule[m]):
+                    if number_pair[0] in match_schedule[m][n]:
+                        pos = match_schedule[m][n].index(number_pair[0])
+                        match_schedule[m][n][pos] = "a"
+                    if number_pair[1] in match_schedule[m][n]:
+                        pos = match_schedule[m][n].index(number_pair[1])
+                        match_schedule[m][n][pos] = "b"
+                    n += 1
+                m += 1
+            
+            m = 0
+            while m < len(match_schedule):
+                n = 0
+                while n < len(match_schedule[m]):
+                    if "a" in match_schedule[m][n]:
+                        pos = match_schedule[m][n].index("a")
+                        match_schedule[m][n][pos] = number_pair[1]
+                    if "b" in match_schedule[m][n]:
+                        pos = match_schedule[m][n].index("b")
+                        match_schedule[m][n][pos] = number_pair[0]
+                    n += 1
+                m += 1
+        else:
+            n = 0
+            while n < len(match_schedule):
+                if number_pair[0] in match_schedule[n]:
+                    pos = match_schedule[n].index(number_pair[0])
+                    match_schedule[n][pos] = "a"
+                if number_pair[1] in match_schedule[n]:
+                    pos = match_schedule[n].index(number_pair[1])
+                    match_schedule[n][pos] = "b"
+                n += 1
+            
+            n = 0
+            while n < len(match_schedule):
+                if "a" in match_schedule[n]:
+                    pos = match_schedule[n].index("a")
+                    match_schedule[n][pos] = number_pair[1]
+                if "b" in match_schedule[n]:
+                    pos = match_schedule[n].index("b")
+                    match_schedule[n][pos] = number_pair[0]
+                n += 1
+    return match_schedule

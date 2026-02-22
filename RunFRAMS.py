@@ -96,6 +96,8 @@ while True:
 
         match_schedule = shuffle_corners_whole_schedule(match_schedule, False)
 
+        match_schedule = randomise_numbers_in_schedule(match_schedule)
+
         export_schedule_to_txt(match_schedule, location, False)
         schedule_score = int(round(get_overall_score_from_schedule(match_schedule, False),0))
 
